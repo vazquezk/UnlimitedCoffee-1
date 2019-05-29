@@ -1,2 +1,2 @@
 # UnlimitedCoffee
-Android secure SMS application
+Android secure SMS application project
