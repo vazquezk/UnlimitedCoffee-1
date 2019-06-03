@@ -55,6 +55,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void deleteUser(String phoneNumber) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // delete user record by phone number
+        db.delete(TABLE_NAME, COL_USER_PHONE + " = ?",
+                new String[]{String.valueOf(phoneNumber)});
+        db.close();
+    }
+
     public boolean checkUser(String phoneNumber, String password){
 
         String[] columns = {COL_USER_ID};

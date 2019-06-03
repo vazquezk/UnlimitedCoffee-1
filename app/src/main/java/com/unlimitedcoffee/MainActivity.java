@@ -2,6 +2,7 @@ package com.unlimitedcoffee;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //Creating instance of Session preferences to store/check user login status
         session = new SessionPreferences(getApplicationContext());
         session.checkLogin();
 
@@ -66,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
+    /*
+    The following two methods create the menu of options in MainActivity
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.options_menu, menu);
@@ -79,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.logout:
                 session.logoutUser();
                 return true;
+            case R.id.app_settings:
+                Intent settings = new Intent(MainActivity.this, AccountSettingsActivity.class);
+                startActivity(settings);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -89,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         arrayAdapter.notifyDataSetChanged();
     }
 
-public void onSendClick(View view) {
+    public void onSendClick(View view) {
 
     if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
             != PackageManager.PERMISSION_GRANTED) {
@@ -100,15 +108,13 @@ public void onSendClick(View view) {
     }
 }
 
-        public void getPermissionToReadSMS() {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                if (shouldShowRequestPermissionRationale(
-                        Manifest.permission.READ_SMS)) {
-                    Toast.makeText(this, "Please allow permission!", Toast.LENGTH_SHORT).show();
-                }
-                requestPermissions(new String[]{Manifest.permission.READ_SMS},
-                        READ_SMS_PERMISSIONS_REQUEST);
+    public void getPermissionToReadSMS() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+            if (shouldShowRequestPermissionRationale(
+                    Manifest.permission.READ_SMS)) {
+                Toast.makeText(this, "Please allow permission!", Toast.LENGTH_SHORT).show();
+            }
+            requestPermissions(new String[]{Manifest.permission.READ_SMS}, READ_SMS_PERMISSIONS_REQUEST);
             }
         }
 
@@ -135,7 +141,7 @@ public void onSendClick(View view) {
 
         }
 
-            public void refreshSmsInbox() {
+        public void refreshSmsInbox() {
             ContentResolver contentResolver = getContentResolver();
             Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
             int indexBody = smsInboxCursor.getColumnIndex("body");
@@ -147,7 +153,7 @@ public void onSendClick(View view) {
                         "\n" + smsInboxCursor.getString(indexBody) + "\n";
                 arrayAdapter.add(str);
             } while (smsInboxCursor.moveToNext());
-//messages.setSelection(arrayAdapter.getCount() - 1);
+            //messages.setSelection(arrayAdapter.getCount() - 1);
     }
 
 
