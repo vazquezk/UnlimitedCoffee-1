@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">SMSapp</string>
+    <string name="phone_number">Phone number</string>
+    <string name="password">Password</string>
+    <string name="login">login</string>
+    <string name="not_registered">Not registered?</string>
+    <string name="register">Register</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="register_button">Register</string>
+    <string name="remove_account">REMOVE ACCOUNT</string>
+    <string name="currently_logged_in_as">Currently logged in as: </string>
+    <string name="dialog_message">Do you really want to delete your account?</string>
+    <string name="dialog_title">Permanently delete account</string>
 </resources>

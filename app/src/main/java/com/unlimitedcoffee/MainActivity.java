@@ -2,6 +2,7 @@ package com.unlimitedcoffee;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,6 +11,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -20,11 +23,14 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    SessionPreferences session;
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
     ArrayAdapter arrayAdapter;
     EditText input;
     SmsManager smsManager = SmsManager.getDefault();
+
     private static MainActivity inst;
 
     private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
@@ -42,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Creating instance of Session preferences to store/check user login status
+        session = new SessionPreferences(getApplicationContext());
+        session.checkLogin();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         messages = (ListView) findViewById(R.id.messages);
@@ -57,13 +68,36 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    /*
+    The following two methods create the menu of options in MainActivity
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Toast.makeText(this, "Selected Item: " +item.getTitle(), Toast.LENGTH_SHORT).show();
+        switch (item.getItemId()) {
+            case R.id.logout:
+                session.logoutUser();
+                return true;
+            case R.id.app_settings:
+                Intent settings = new Intent(MainActivity.this, AccountSettingsActivity.class);
+                startActivity(settings);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     public void updateInbox(final String smsMessage) {
         arrayAdapter.insert(smsMessage, 0);
         arrayAdapter.notifyDataSetChanged();
     }
 
-public void onSendClick(View view) {
+    public void onSendClick(View view) {
 
     if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
             != PackageManager.PERMISSION_GRANTED) {
@@ -74,15 +108,13 @@ public void onSendClick(View view) {
     }
 }
 
-        public void getPermissionToReadSMS() {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                if (shouldShowRequestPermissionRationale(
-                        Manifest.permission.READ_SMS)) {
-                    Toast.makeText(this, "Please allow permission!", Toast.LENGTH_SHORT).show();
-                }
-                requestPermissions(new String[]{Manifest.permission.READ_SMS},
-                        READ_SMS_PERMISSIONS_REQUEST);
+    public void getPermissionToReadSMS() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+            if (shouldShowRequestPermissionRationale(
+                    Manifest.permission.READ_SMS)) {
+                Toast.makeText(this, "Please allow permission!", Toast.LENGTH_SHORT).show();
+            }
+            requestPermissions(new String[]{Manifest.permission.READ_SMS}, READ_SMS_PERMISSIONS_REQUEST);
             }
         }
 
@@ -109,7 +141,7 @@ public void onSendClick(View view) {
 
         }
 
-            public void refreshSmsInbox() {
+        public void refreshSmsInbox() {
             ContentResolver contentResolver = getContentResolver();
             Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
             int indexBody = smsInboxCursor.getColumnIndex("body");
@@ -121,7 +153,7 @@ public void onSendClick(View view) {
                         "\n" + smsInboxCursor.getString(indexBody) + "\n";
                 arrayAdapter.add(str);
             } while (smsInboxCursor.moveToNext());
-//messages.setSelection(arrayAdapter.getCount() - 1);
+            //messages.setSelection(arrayAdapter.getCount() - 1);
     }
 
 
