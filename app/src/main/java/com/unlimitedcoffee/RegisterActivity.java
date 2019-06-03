@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    SessionPreferences session;
+
     EditText mTextPhoneNumber;
     EditText mTextPassword;
     EditText mTextCfPassword;
@@ -20,6 +22,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        session = new SessionPreferences(getApplicationContext());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
@@ -38,6 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
                 String cf_password = mTextCfPassword.getText().toString().trim();
 
                 if(password.equals(cf_password)){
+                    session.createLoginSession(phoneNumber);
                     db.addUser(phoneNumber,password);
                     Intent smsApp = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(smsApp);
