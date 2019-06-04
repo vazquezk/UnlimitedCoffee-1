@@ -79,6 +79,9 @@ public class SessionPreferences {
         _context.startActivity(i);
     }
 
+    public String getKeyName(){ return preferences.getString(KEY_NAME, "Not found");
+    }
+
     // Get Login State
     public boolean isLoggedIn(){
         return preferences.getBoolean(IS_LOGIN, false);
