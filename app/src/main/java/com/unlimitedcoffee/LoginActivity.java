@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
 
+    SessionPreferences session;
+
     EditText mTextPhoneNumber;
     EditText mTextPassword;
     Button mLoginButton;
@@ -20,6 +22,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        session = new SessionPreferences(getApplicationContext());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -45,8 +50,10 @@ public class LoginActivity extends AppCompatActivity {
                 Boolean res = db.checkUser(phoneNumber,password);
 
                 if(res == true) {
+                    session.createLoginSession(phoneNumber);
                     Intent smsApp = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(smsApp);
+
                 }else{
                     Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
                 }
