@@ -9,6 +9,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+
+import static com.google.i18n.phonenumbers.PhoneNumberUtil.*;
+
 public class RegisterActivity extends AppCompatActivity {
 
     SessionPreferences session;
@@ -23,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //Instance of session to establish log in status
         session = new SessionPreferences(getApplicationContext());
 
         super.onCreate(savedInstanceState);
@@ -42,17 +49,42 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = mTextPassword.getText().toString().trim();
                 String cf_password = mTextCfPassword.getText().toString().trim();
 
-                if(password.equals(cf_password)){
-                    session.createLoginSession(phoneNumber);
-                    db.addUser(phoneNumber,password);
-                    Intent smsApp = new Intent(RegisterActivity.this, MainActivity.class);
-                    startActivity(smsApp);
-                }else {
-                    Toast.makeText(RegisterActivity.this, "Passwords don't match!", Toast.LENGTH_SHORT).show();
+                //Validating phone number
+                if(isValidMobile(phoneNumber)) {
+                    //Validating password confirmation
+                    if (password.equals(cf_password)) {
+                        session.createLoginSession(phoneNumber);
+                        db.addUser(phoneNumber, password);
+                        Intent smsApp = new Intent(RegisterActivity.this, MainActivity.class);
+                        startActivity(smsApp);
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Passwords don't match!", Toast.LENGTH_SHORT).show();
+                    }
+                } else{
+                    Toast.makeText(RegisterActivity.this, "Invalid phone number. Please include country code. E.g. \"1 + phone number for US\"", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+    }
+    /*
+    Method to validate phone numbers.
+     */
+    private boolean isValidMobile(String phone) {
 
+        boolean isValid = false;
+
+        PhoneNumberUtil phoneUtil = getInstance();
+
+        try {
+
+            Phonenumber.PhoneNumber usNumberProto = phoneUtil.parse( "+"+phone,"");
+            isValid = getInstance().isValidNumber(usNumberProto);
+
+        } catch (NumberParseException e) {
+            System.err.println("NumberParseException was thrown: " + e.toString());
+        }
+
+        return isValid;
     }
 }

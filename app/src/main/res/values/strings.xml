@@ -11,4 +11,5 @@
     <string name="currently_logged_in_as">Currently logged in as: </string>
     <string name="dialog_message">Do you really want to delete your account?</string>
     <string name="dialog_title">Permanently delete account</string>
+    <string name="phone_number_hint">Phone number must include country code.</string>
 </resources>

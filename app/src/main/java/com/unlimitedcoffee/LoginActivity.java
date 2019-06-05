@@ -9,6 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+
+
 public class LoginActivity extends AppCompatActivity {
 
     SessionPreferences session;
@@ -58,11 +61,8 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
                 }
 
-
             }
         });
-
-
 
     }
 }
