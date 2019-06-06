@@ -6,19 +6,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-
 import static com.google.i18n.phonenumbers.PhoneNumberUtil.*;
 
 public class RegisterActivity extends AppCompatActivity {
 
     SessionPreferences session;
-
     EditText mTextPhoneNumber;
     EditText mTextPassword;
     EditText mTextCfPassword;
@@ -35,6 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        //Instance of db helper
         db = new DatabaseHelper(this);
 
         mTextPhoneNumber = (EditText) findViewById(R.id.edittext_username);
@@ -42,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
         mTextCfPassword = (EditText) findViewById(R.id.edittext_cf_password);
         mRegisterButton = (Button) findViewById(R.id.register_button);
 
+        //OnClickLister for Register button
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,8 +65,9 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
     }
+
     /*
-    Method to validate phone numbers.
+    Method to validate phone numbers. Returns true if phone number is valid.
      */
     private boolean isValidMobile(String phone) {
 
@@ -78,8 +77,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         try {
 
-            Phonenumber.PhoneNumber usNumberProto = phoneUtil.parse( "+"+phone,"");
-            isValid = getInstance().isValidNumber(usNumberProto);
+            Phonenumber.PhoneNumber parsedNumber = phoneUtil.parse( "+"+phone,"");
+            isValid = getInstance().isValidNumber(parsedNumber);
 
         } catch (NumberParseException e) {
             System.err.println("NumberParseException was thrown: " + e.toString());

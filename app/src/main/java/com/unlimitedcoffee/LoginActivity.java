@@ -9,13 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-
-
 public class LoginActivity extends AppCompatActivity {
 
     SessionPreferences session;
-
     EditText mTextPhoneNumber;
     EditText mTextPassword;
     Button mLoginButton;
@@ -26,17 +22,20 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //Instance of session to establish log in status
         session = new SessionPreferences(getApplicationContext());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        //Instance of db helper
         db = new DatabaseHelper(this);
+
         mTextPhoneNumber = (EditText) findViewById(R.id.edittext_username);
         mTextPassword = (EditText) findViewById(R.id.edittext_password);
         mLoginButton = (Button) findViewById(R.id.login_button);
         mTextViewRegister = (TextView) findViewById(R.id.textview_register);
 
+        //OnClickListener for register text
         mTextViewRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,13 +44,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        //OnClickListener for Login button
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String phoneNumber = mTextPhoneNumber.getText().toString().trim();
                 String password = mTextPassword.getText().toString().trim();
                 Boolean res = db.checkUser(phoneNumber,password);
-
+                //If phone number and password are correct
                 if(res == true) {
                     session.createLoginSession(phoneNumber);
                     Intent smsApp = new Intent(LoginActivity.this, MainActivity.class);
@@ -60,9 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
-
     }
 }

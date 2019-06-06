@@ -79,6 +79,7 @@ public class SessionPreferences {
         _context.startActivity(i);
     }
 
+    //Returns phone number
     public String getKeyName(){ return preferences.getString(KEY_NAME, "Not found");
     }
 

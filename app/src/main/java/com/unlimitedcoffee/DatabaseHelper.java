@@ -24,7 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //Drop SQL Table
     private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-
+    //Class constructor
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -32,17 +32,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_USER_TABLE);
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL(DROP_USER_TABLE);
-
         onCreate(sqLiteDatabase);
 
     }
 
+    //Method to add new users
     public void addUser(String phoneNumber, String password){
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -55,6 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    //Method to delete existing accounts
     public void deleteUser(String phoneNumber) {
         SQLiteDatabase db = this.getWritableDatabase();
         // delete user record by phone number
@@ -66,11 +66,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean checkUser(String phoneNumber, String password){
 
         String[] columns = {COL_USER_ID};
-
         SQLiteDatabase db = this.getReadableDatabase();
-
         String selection = COL_USER_PHONE + "=?" + " and " + COL_USER_PASSWORD + "=?";
-
         String[] selectionArgs = {phoneNumber, password};
 
         Cursor cursor = db.query(TABLE_NAME, columns,selection,selectionArgs, null, null, null);
@@ -83,8 +80,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
         else
             return false;
-
-
     }
-
 }
