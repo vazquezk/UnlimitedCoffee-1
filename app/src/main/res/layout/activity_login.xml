@@ -12,7 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="150dp"
-        android:hint="@string/phone_number"/>
+        android:hint="@string/phone_number"
+        android:inputType="number"/>
 
     <EditText
         android:id="@+id/edittext_password"

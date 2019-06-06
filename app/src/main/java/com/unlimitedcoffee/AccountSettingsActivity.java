@@ -16,16 +16,16 @@ public class AccountSettingsActivity extends AppCompatActivity {
     DatabaseHelper db;
     AlertDialog.Builder builder;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        //Instance of builder for alert dialog
         builder = new AlertDialog.Builder(this);
 
         //Creating instance of Session preferences to store/check user login status
         session = new SessionPreferences(getApplicationContext());
         session.checkLogin();
 
+        //Instance of db helper
         db = new DatabaseHelper(this);
 
         super.onCreate(savedInstanceState);
@@ -35,6 +35,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         mTextViewLoggedInAs = (TextView) findViewById(R.id.logged_in_as);
         mTextViewLoggedInAs.setText("Currently logged in as: " + session.getKeyName());
 
+        //OnClickListener for delete account button
         mDeleteAccButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
