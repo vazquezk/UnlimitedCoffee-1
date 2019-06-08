@@ -63,12 +63,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    //Checks database for phone number and password
     public boolean checkUser(String phoneNumber, String password){
 
         String[] columns = {COL_USER_ID};
         SQLiteDatabase db = this.getReadableDatabase();
         String selection = COL_USER_PHONE + "=?" + " and " + COL_USER_PASSWORD + "=?";
         String[] selectionArgs = {phoneNumber, password};
+
+        Cursor cursor = db.query(TABLE_NAME, columns,selection,selectionArgs, null, null, null);
+
+        int count = cursor.getCount();
+
+        db.close();
+
+        if(count > 0)
+            return true;
+        else
+            return false;
+    }
+
+    //Checks if phone number is already in database
+    public boolean checkPhone(String phoneNumber){
+
+        String[] columns = {COL_USER_ID};
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selection = COL_USER_PHONE + "=?";
+        String[] selectionArgs = {phoneNumber};
 
         Cursor cursor = db.query(TABLE_NAME, columns,selection,selectionArgs, null, null, null);
 

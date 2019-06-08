@@ -49,14 +49,19 @@ public class RegisterActivity extends AppCompatActivity {
 
                 //Validating phone number
                 if(isValidMobile(phoneNumber)) {
-                    //Validating password confirmation
-                    if (password.equals(cf_password)) {
-                        session.createLoginSession(phoneNumber);
-                        db.addUser(phoneNumber, password);
-                        Intent smsApp = new Intent(RegisterActivity.this, MainActivity.class);
-                        startActivity(smsApp);
-                    } else {
-                        Toast.makeText(RegisterActivity.this, "Passwords don't match!", Toast.LENGTH_SHORT).show();
+                    //Checks if phone number is already registered
+                    if(!db.checkPhone(phoneNumber)) {
+                        //Validating password confirmation
+                        if (password.equals(cf_password)) {
+                            session.createLoginSession(phoneNumber);
+                            db.addUser(phoneNumber, password);
+                            Intent smsApp = new Intent(RegisterActivity.this, MainActivity.class);
+                            startActivity(smsApp);
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "Passwords don't match!", Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        Toast.makeText(RegisterActivity.this, "Phone number already registered.", Toast.LENGTH_SHORT).show();
                     }
                 } else{
                     Toast.makeText(RegisterActivity.this, "Invalid phone number. Please include country code. E.g. \"1 + phone number for US\"", Toast.LENGTH_SHORT).show();
