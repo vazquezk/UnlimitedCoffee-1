@@ -10,6 +10,10 @@ import android.widget.Toast;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static com.google.i18n.phonenumbers.PhoneNumberUtil.*;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -52,13 +56,13 @@ public class RegisterActivity extends AppCompatActivity {
                     //Checks if phone number is already registered
                     if(!db.checkPhone(phoneNumber)) {
                         //Validating password confirmation
-                        if (password.equals(cf_password)) {
+                        if (password.equals(cf_password) && isValidPassword(password)) {
                             session.createLoginSession(phoneNumber);
                             db.addUser(phoneNumber, password);
                             Intent smsApp = new Intent(RegisterActivity.this, MainActivity.class);
                             startActivity(smsApp);
                         } else {
-                            Toast.makeText(RegisterActivity.this, "Passwords don't match!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, "Passwords don't match or doesn't meet requirements!", Toast.LENGTH_SHORT).show();
                         }
                     }else{
                         Toast.makeText(RegisterActivity.this, "Phone number already registered.", Toast.LENGTH_SHORT).show();
@@ -90,5 +94,19 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         return isValid;
+    }
+    /*
+    Method to validate password. Password must have at least one upper case and lower case character, a number and a special character.
+     */
+    public static boolean isValidPassword(String password) {
+
+        Pattern pattern;
+        Matcher matcher;
+        String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{4,}$";
+        pattern = Pattern.compile(PASSWORD_PATTERN);
+        matcher = pattern.matcher(password);
+
+        return matcher.matches();
+
     }
 }
