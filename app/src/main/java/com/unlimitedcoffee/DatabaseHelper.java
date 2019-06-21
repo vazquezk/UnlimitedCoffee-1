@@ -78,16 +78,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
         if (cursor.moveToFirst()) {
             hashed_pword = cursor.getString(0);
-
             // 2. use jBcrypt checkpw() function to verify password
             if (BCrypt.checkpw(password, hashed_pword)) {
-                // pword matches
-                isValid = true;
+                isValid = true; // pword matches
             } else {
-                // pword does not match
-                isValid = false;
+                isValid = false; // pword does not match
             }
-            return isValid;
         } else {
             isValid = false;
         }
