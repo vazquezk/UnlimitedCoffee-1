@@ -48,8 +48,8 @@ public class LoginActivity extends AppCompatActivity {
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String phoneNumber = mTextPhoneNumber.getText().toString().trim();
-                String password = mTextPassword.getText().toString().trim();
+                String phoneNumber = Utilities.sanitize(mTextPhoneNumber.getText().toString());
+                String password = Utilities.sanitize(mTextPassword.getText().toString());
                 Boolean res = db.checkUser(phoneNumber,password);
                 //If phone number and password are correct
                 if(res == true) {
