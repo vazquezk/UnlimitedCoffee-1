@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">SMSapp</string>
+    <string name="app_name">CoffeeTalk</string>
     <string name="phone_number">Phone number</string>
     <string name="password">Password</string>
     <string name="login">login</string>
     <string name="not_registered">Not registered?</string>
-    <string name="register">Register</string>
+    <string name="register">Register here.</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="register_button">Register</string>
     <string name="remove_account">REMOVE ACCOUNT</string>

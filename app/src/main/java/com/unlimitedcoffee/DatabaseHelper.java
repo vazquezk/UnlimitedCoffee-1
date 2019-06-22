@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -42,12 +44,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //Method to add new users
-    public void addUser(String phoneNumber, String password){
+    public void addUser(String phoneNumber, String password) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(COL_USER_PHONE,phoneNumber);
+        contentValues.put(COL_USER_PHONE, phoneNumber);
         contentValues.put(COL_USER_PASSWORD, password);
 
         db.insert(TABLE_NAME, null, contentValues);
@@ -63,20 +65,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public boolean checkUser(String phoneNumber, String password){
+    //Checks database for phone number and password
+    public boolean checkUser(String phoneNumber, String password) {
+        boolean isValid;
+        String hashed_pword;
+
+        // 1. pull saved password hash from db
+        String[] columns = {COL_USER_PASSWORD};
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selection = COL_USER_PHONE + "=?";
+        String[] selectionArgs = {phoneNumber};
+        Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        if (cursor.moveToFirst()) {
+            hashed_pword = cursor.getString(0);
+            // 2. use jBcrypt checkpw() function to verify password
+            if (BCrypt.checkpw(password, hashed_pword)) {
+                isValid = true; // pword matches
+            } else {
+                isValid = false; // pword does not match
+            }
+        } else {
+            isValid = false;
+        }
+        cursor.close();
+        db.close();
+        return isValid;
+    }
+
+    //Checks if phone number is already in database
+    public boolean checkPhone(String phoneNumber) {
 
         String[] columns = {COL_USER_ID};
         SQLiteDatabase db = this.getReadableDatabase();
-        String selection = COL_USER_PHONE + "=?" + " and " + COL_USER_PASSWORD + "=?";
-        String[] selectionArgs = {phoneNumber, password};
+        String selection = COL_USER_PHONE + "=?";
+        String[] selectionArgs = {phoneNumber};
 
-        Cursor cursor = db.query(TABLE_NAME, columns,selection,selectionArgs, null, null, null);
+        Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
 
         int count = cursor.getCount();
 
         db.close();
 
-        if(count > 0)
+        if (count > 0)
             return true;
         else
             return false;
