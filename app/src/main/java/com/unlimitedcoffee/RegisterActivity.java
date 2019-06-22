@@ -25,6 +25,10 @@ public class RegisterActivity extends AppCompatActivity {
     Button mRegisterButton;
     DatabaseHelper db;
 
+    @Override // prevent backpress from launching main smsapp activity
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
