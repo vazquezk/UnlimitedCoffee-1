@@ -18,6 +18,10 @@ public class LoginActivity extends AppCompatActivity {
     TextView mTextViewRegister;
     DatabaseHelper db;
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,4 +67,5 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 }
