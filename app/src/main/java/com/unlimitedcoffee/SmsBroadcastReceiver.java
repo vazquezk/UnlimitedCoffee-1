@@ -21,11 +21,11 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 String format = intentExtras.getString("format");
                 SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) sms[i], format);
 
-                String smsBody = smsMessage.getMessageBody().toString();
+                String smsBody = smsMessage.getMessageBody();
                 String address = smsMessage.getOriginatingAddress();
 
-                smsMessageStr += "SMS From: " + address + "\n";
-                smsMessageStr += smsBody + "\n";
+                smsMessageStr = "SMS From: " + address + "\n";
+                smsMessageStr = TextEncryption.decrypt(smsBody) + "\n";
             }
 
             MainActivity inst = MainActivity.instance();

@@ -25,6 +25,10 @@ public class RegisterActivity extends AppCompatActivity {
     Button mRegisterButton;
     DatabaseHelper db;
 
+    @Override // prevent backpress from launching main smsapp activity
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +51,9 @@ public class RegisterActivity extends AppCompatActivity {
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String phoneNumber = mTextPhoneNumber.getText().toString().trim();
-                String password = mTextPassword.getText().toString().trim();
-                String cf_password = mTextCfPassword.getText().toString().trim();
+                String phoneNumber = Utilities.sanitize(mTextPhoneNumber.getText().toString());
+                String password = Utilities.sanitize(mTextPassword.getText().toString());
+                String cf_password = Utilities.sanitize(mTextCfPassword.getText().toString());
 
                 //Validating phone number
                 if(isValidMobile(phoneNumber)) {
@@ -58,7 +62,9 @@ public class RegisterActivity extends AppCompatActivity {
                         //Validating password confirmation
                         if (password.equals(cf_password) && isValidPassword(password)) {
                             session.createLoginSession(phoneNumber);
-                            db.addUser(phoneNumber, password);
+                            // hash user password
+                            String pwordHash = Utilities.hashPword(password);
+                            db.addUser(phoneNumber, pwordHash);
                             Intent smsApp = new Intent(RegisterActivity.this, MainActivity.class);
                             startActivity(smsApp);
                         } else {

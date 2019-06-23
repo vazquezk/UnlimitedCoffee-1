@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter arrayAdapter;
     EditText input;
     SmsManager smsManager = SmsManager.getDefault();
+    private String sentPhoneNumber = "+15555215554";
 
     private static MainActivity inst;
 
@@ -98,12 +99,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSendClick(View view) {
-
+        String textMessage = input.getText().toString();
     if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
             != PackageManager.PERMISSION_GRANTED) {
         getPermissionToReadSMS();
     } else {
-        smsManager.sendTextMessage("+1yournumberhere", null, input.getText().toString(), null, null);
+        String encryptedText = TextEncryption.encrypt(textMessage);
+        smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
+        String decryptedText = TextEncryption.decrypt(encryptedText);
+        System.out.println(decryptedText);
         Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
     }
 }
