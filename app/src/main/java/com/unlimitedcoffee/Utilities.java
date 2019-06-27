@@ -35,7 +35,7 @@ import org.mindrot.jbcrypt.BCrypt;
      * @param original string
      * @return escaped string
      */
-    private static String escape(String original)
+    static String escape(String original)
     {
         return escapeSpecial(escapeBr(escapeTags(original)));
     }
@@ -45,7 +45,7 @@ import org.mindrot.jbcrypt.BCrypt;
      * @param original string
      * @return escaped string
      */
-    private static String escapeTags(String original)
+    static String escapeTags(String original)
     {
         if(original==null) return "";
         StringBuilder out=new StringBuilder();
@@ -71,7 +71,7 @@ import org.mindrot.jbcrypt.BCrypt;
      * @param original string
      * @return escaped string
      */
-    private static String escapeBr(String original)
+    static String escapeBr(String original)
     {
         if(original==null) return "";
         StringBuilder out=new StringBuilder();
