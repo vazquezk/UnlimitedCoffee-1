@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -33,7 +34,9 @@
 
         <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".AccountSettingsActivity"></activity>
+        <activity android:name=".AccountSettingsActivity" />
+        <activity android:name=".ContactsSearchActivity"
+            android:theme="@style/contacts_search"></activity>
     </application>
 
 </manifest>
