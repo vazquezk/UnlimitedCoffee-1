@@ -84,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
     /*
     Method to validate phone numbers. Returns true if phone number is valid.
      */
-    private boolean isValidMobile(String phone) {
+    static boolean isValidMobile(String phone) {
 
         boolean isValid = false;
 

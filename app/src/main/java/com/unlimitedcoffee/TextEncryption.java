@@ -1,5 +1,6 @@
 package com.unlimitedcoffee;
 
+import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
@@ -16,8 +17,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-public class TextEncryption {
-
+public abstract class TextEncryption extends Context {
     private static final String KEY= "t3sting1";
 
     public static String encrypt(String value) {
@@ -27,7 +27,7 @@ public class TextEncryption {
             SecretKey key = keyFactory.generateSecret(keySpec);
 
             byte[] clearText = value.getBytes("UTF8");
-            // Cipher is not thread safe
+            // Implement this in a thread safe way, or switch to AES.
             Cipher cipher = Cipher.getInstance("DES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
@@ -48,14 +48,14 @@ public class TextEncryption {
             SecretKey key = keyFactory.generateSecret(keySpec);
 
             byte[] encrypedPwdBytes = Base64.decode(value, Base64.DEFAULT);
-            // cipher is not thread safe
+            // Implement this in a thread safe way, or switch to AES.
             Cipher cipher = Cipher.getInstance("DES");
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
 
-            String decrypedValue = new String(decrypedValueBytes);
-            Log.d("Oh snap!", "Decrypted: " + value + " -> " + decrypedValue);
-            return decrypedValue;
+            String decrypedText = new String(decrypedValueBytes);
+            Log.d("Oh snap!", "Decrypted: " + value + " -> " + decrypedText);
+            return decrypedText;
 
         } catch (InvalidKeyException | UnsupportedEncodingException | InvalidKeySpecException | NoSuchAlgorithmException| BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException  e) {
             e.printStackTrace();

@@ -90,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent settings = new Intent(MainActivity.this, AccountSettingsActivity.class);
                 startActivity(settings);
                 return true;
+            case R.id.contacts_search:
+                Intent contacts_search = new Intent(MainActivity.this, ContactsSearchActivity.class);
+                startActivity(contacts_search);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -104,17 +108,17 @@ public class MainActivity extends AppCompatActivity {
     public void onSendClick(View view) {
         String sentPhoneNumber = text_Phone_Number.getText().toString().trim();
         String textMessage = input.getText().toString();
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-            != PackageManager.PERMISSION_GRANTED) {
-        getPermissionToReadSMS();
-    } else {
-        String encryptedText = TextEncryption.encrypt(textMessage);
-        smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
-        String decryptedText = TextEncryption.decrypt(encryptedText);
-        System.out.println(decryptedText);
-        Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            getPermissionToReadSMS();
+        } else {
+            String encryptedText = TextEncryption.encrypt(textMessage);
+            smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
+            String decryptedText = TextEncryption.decrypt(encryptedText);
+            System.out.println(decryptedText);
+            Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+        }
     }
-}
 
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
@@ -123,8 +127,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please allow permission!", Toast.LENGTH_SHORT).show();
             }
             requestPermissions(new String[]{Manifest.permission.READ_SMS}, READ_SMS_PERMISSIONS_REQUEST);
-            }
         }
+    }
 
 
     @Override
@@ -138,30 +142,30 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Read SMS permission granted", Toast.LENGTH_SHORT).show();
                 refreshSmsInbox();
             } else {
-                     Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
-                    }
-
-            } else {
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
             }
 
-
-
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-        public void refreshSmsInbox() {
-            ContentResolver contentResolver = getContentResolver();
-            Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
-            int indexBody = smsInboxCursor.getColumnIndex("body");
-            int indexAddress = smsInboxCursor.getColumnIndex("address");
-            if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
-            arrayAdapter.clear();
-            do {
-                String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                        "\n" + smsInboxCursor.getString(indexBody) + "\n";
-                arrayAdapter.add(str);
-            } while (smsInboxCursor.moveToNext());
-            //messages.setSelection(arrayAdapter.getCount() - 1);
+
+
+    }
+
+    public void refreshSmsInbox() {
+        ContentResolver contentResolver = getContentResolver();
+        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        int indexBody = smsInboxCursor.getColumnIndex("body");
+        int indexAddress = smsInboxCursor.getColumnIndex("address");
+        if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
+        arrayAdapter.clear();
+        do {
+            String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
+                    "\n" + smsInboxCursor.getString(indexBody) + "\n";
+            arrayAdapter.add(str);
+        } while (smsInboxCursor.moveToNext());
+        //messages.setSelection(arrayAdapter.getCount() - 1);
     }
 
 
