@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
             String decryptedText = TextEncryption.decrypt(encryptedText);
             System.out.println(decryptedText);
             Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+            input.setText("");
         }
     }
 
