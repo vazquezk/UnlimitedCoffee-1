@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
     ArrayAdapter arrayAdapter;
-    EditText input, text_Phone_Number;
+    EditText input;
+    EditText text_Phone_Number;
     SmsManager smsManager = SmsManager.getDefault();
 
 
@@ -57,12 +58,13 @@ public class MainActivity extends AppCompatActivity {
         session = new SessionPreferences(getApplicationContext());
         session.checkLogin();
 
-        text_Phone_Number = (EditText)findViewById(R.id.txt_phone_number);
+        //text_Phone_Number = (EditText)findViewById(R.id.txt_phone_number);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         messages = (ListView) findViewById(R.id.messages);
         input = (EditText) findViewById(R.id.input);
+        text_Phone_Number = (EditText) findViewById(R.id.txt_phone_number);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, smsMessagesList);
         messages.setAdapter(arrayAdapter);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
