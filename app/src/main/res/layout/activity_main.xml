@@ -41,6 +41,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:background="@drawable/edit_button_border"
+        android:textColor="#ffffffff"
         android:onClick="onSendClick" />
 
     <ListView
