@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
     ArrayAdapter arrayAdapter;
-    EditText input;
+    EditText input, text_Phone_Number;
     SmsManager smsManager = SmsManager.getDefault();
-    private String sentPhoneNumber = "+15555215554";
+
 
     private static MainActivity inst;
 
@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         //Creating instance of Session preferences to store/check user login status
         session = new SessionPreferences(getApplicationContext());
         session.checkLogin();
+
+        text_Phone_Number = (EditText)findViewById(R.id.txt_phone_number);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -98,11 +100,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateInbox(final String smsMessage) {
+
         arrayAdapter.insert(smsMessage, 0);
         arrayAdapter.notifyDataSetChanged();
     }
 
     public void onSendClick(View view) {
+        String sentPhoneNumber = text_Phone_Number.getText().toString().trim();
         String textMessage = input.getText().toString();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
