@@ -10,9 +10,10 @@ import org.mindrot.jbcrypt.BCrypt;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
+    public static final byte[] databaseBytes = Hide.getDatabaseName();
+    public static final String databaseName = new String(databaseBytes);
     //Database name and columns
-    public static final String DATABASE_NAME = "UserManagement.db";
+    public static final String DATABASE_NAME = databaseName;
     public static final String TABLE_NAME = "user";
     public static final int DATABASE_VERSION = 1;
     public static final String COL_USER_ID = "user_id";

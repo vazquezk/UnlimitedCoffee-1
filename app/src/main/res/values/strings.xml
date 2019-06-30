@@ -12,4 +12,5 @@
     <string name="dialog_message">Do you really want to delete your account?</string>
     <string name="dialog_title">Permanently delete account</string>
     <string name="phone_number_hint">Phone number must include country code.</string>
+    <string name="e_key">t3st1ng</string>
 </resources>

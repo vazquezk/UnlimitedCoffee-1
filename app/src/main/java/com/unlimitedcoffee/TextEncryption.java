@@ -1,6 +1,5 @@
 package com.unlimitedcoffee;
 
-import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
@@ -17,12 +16,13 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
-public abstract class TextEncryption extends Context {
-    private static final String KEY= "t3sting1";
+public abstract class TextEncryption {
+    private static final byte[] KEY = Hide.getKey();
 
     public static String encrypt(String value) {
         try {
-            DESKeySpec keySpec = new DESKeySpec(KEY.getBytes("UTF8"));
+            System.out.println(KEY);
+            DESKeySpec keySpec = new DESKeySpec(KEY);
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
             SecretKey key = keyFactory.generateSecret(keySpec);
 
@@ -43,7 +43,7 @@ public abstract class TextEncryption extends Context {
 
     public static String decrypt(String value) {
         try {
-            DESKeySpec keySpec = new DESKeySpec(KEY.getBytes("UTF8"));
+            DESKeySpec keySpec = new DESKeySpec(KEY);
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
             SecretKey key = keyFactory.generateSecret(keySpec);
 
@@ -57,7 +57,7 @@ public abstract class TextEncryption extends Context {
             Log.d("Oh snap!", "Decrypted: " + value + " -> " + decrypedText);
             return decrypedText;
 
-        } catch (InvalidKeyException | UnsupportedEncodingException | InvalidKeySpecException | NoSuchAlgorithmException| BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException  e) {
+        } catch (InvalidKeyException | InvalidKeySpecException | NoSuchAlgorithmException| BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException  e) {
             e.printStackTrace();
         }
         return value;
