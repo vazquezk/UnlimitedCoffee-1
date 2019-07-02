@@ -8,27 +8,24 @@ import android.media.AudioFocusRequest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.support.v4.widget.SimpleCursorAdapter;
 
 import java.util.ArrayList;
 
-public class MessageHistoryActivity extends Activity {
+public class MessageHistoryActivity extends AppCompatActivity {
 
     SessionPreferences session;
     FloatingActionButton newMsgBtn;
-
-    /***/
-    ArrayList <String>smsMessageList = new ArrayList<String>();
     ListView smsListView;
     MessageHistAdapter msgAdapter;
     ArrayList<String> phoneNumber = new ArrayList<>();
     ArrayList<String> messages = new ArrayList<>();
+
     /**
      * One create method for the message History activity
      * @param savedInstanceState
@@ -64,45 +61,6 @@ public class MessageHistoryActivity extends Activity {
 
     } // end onCreate
 
-    private void refreshSMSInbox() {
-
-        Uri inboxURI = Uri.parse("content://sms/inbox");
-        String[] requestedColumns = new String[]{"_id", "address", "body"};
-        ContentResolver cr = getContentResolver();
-        Cursor smsInboxCursor = cr.query(inboxURI, requestedColumns, null, null,null);
-        int indexBody = smsInboxCursor.getColumnIndex("body");
-        int indexAddress = smsInboxCursor.getColumnIndex("address");
-
-        ArrayList <String> StoredPhoneNumbers = new ArrayList<String>();
-        ArrayList <Message> StoredMessages = new ArrayList<Message>();
-        ArrayList <Conversation> conversations = new ArrayList<Conversation>();
-        smsInboxCursor.moveToFirst(); // last text sent
-
-        if (indexBody < 0 ||  !smsInboxCursor.moveToNext()) return;
-        do {
-            if (!StoredPhoneNumbers.contains(smsInboxCursor.getString(indexAddress))){
-                StoredPhoneNumbers.add(smsInboxCursor.getString(indexAddress)); // add phone number
-            }
-            StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
-                smsInboxCursor.getString(indexBody)));    // add message
-
-        } while(smsInboxCursor.moveToNext());
-
-        for (String sNumber: StoredPhoneNumbers){   // group messages per phone number
-            ArrayList <String> numMessages = new ArrayList<String>();
-            for (Message m: StoredMessages){
-                if (m.getNumber().equals(sNumber)){
-                    numMessages.add(m.getBody());
-                }
-            }
-            conversations.add(new Conversation(sNumber, numMessages));
-        }
-
-        for (Conversation c: conversations) {
-            phoneNumber.add(c.getNumber());
-            messages.add(c.findLastMessage());
-        }
-    }
     /**
      * The following two methods create the menu of options in MainActivity
      * @param menu
@@ -143,5 +101,46 @@ public class MessageHistoryActivity extends Activity {
                 return super.onOptionsItemSelected(item);
         }   // end switch
     }   // end menu option selection
+
+
+    private void refreshSMSInbox() {
+
+        Uri inboxURI = Uri.parse("content://sms/inbox");
+        String[] requestedColumns = new String[]{"_id", "address", "body"};
+        ContentResolver cr = getContentResolver();
+        Cursor smsInboxCursor = cr.query(inboxURI, requestedColumns, null, null,null);
+        int indexBody = smsInboxCursor.getColumnIndex("body");
+        int indexAddress = smsInboxCursor.getColumnIndex("address");
+
+        ArrayList <String> StoredPhoneNumbers = new ArrayList<String>();
+        ArrayList <Message> StoredMessages = new ArrayList<Message>();
+        ArrayList <Conversation> conversations = new ArrayList<Conversation>();
+        smsInboxCursor.moveToFirst(); // last text sent
+
+        if (indexBody < 0 ||  !smsInboxCursor.moveToNext()) return;
+        do {
+            if (!StoredPhoneNumbers.contains(smsInboxCursor.getString(indexAddress))){
+                StoredPhoneNumbers.add(smsInboxCursor.getString(indexAddress)); // add phone number
+            }
+            StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
+                    smsInboxCursor.getString(indexBody)));    // add message
+
+        } while(smsInboxCursor.moveToNext());
+
+        for (String sNumber: StoredPhoneNumbers){   // group messages per phone number
+            ArrayList <String> numMessages = new ArrayList<String>();
+            for (Message m: StoredMessages){
+                if (m.getNumber().equals(sNumber)){
+                    numMessages.add(m.getBody());
+                }
+            }
+            conversations.add(new Conversation(sNumber, numMessages));
+        }
+
+        for (Conversation c: conversations) {
+            phoneNumber.add(c.getNumber());
+            messages.add(c.findLastMessage());
+        }
+    }
 }   // end class
 
