@@ -1,19 +1,34 @@
 package com.unlimitedcoffee;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
+import android.media.AudioFocusRequest;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
+import android.support.v4.widget.SimpleCursorAdapter;
 
-public class MessageHistoryActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MessageHistoryActivity extends Activity {
 
     SessionPreferences session;
     FloatingActionButton newMsgBtn;
 
+    /***/
+    ArrayList <String>smsMessageList = new ArrayList<String>();
+    ListView smsListView;
+    MessageHistAdapter msgAdapter;
+    ArrayList<String> phoneNumber = new ArrayList<>();
+    ArrayList<String> messages = new ArrayList<>();
     /**
      * One create method for the message History activity
      * @param savedInstanceState
@@ -27,9 +42,17 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_history);
+
+        /*****/
+        smsListView = (ListView) findViewById(R.id.lvMsg) ;
+
+        msgAdapter = new MessageHistAdapter (this, phoneNumber , messages);
+        smsListView.setAdapter(msgAdapter);
+        refreshSMSInbox();
+
+        /*****/
         // assign new message button
         newMsgBtn = (FloatingActionButton) findViewById(R.id.newMsgBtn);
-
         //send user to new message entry page
         newMsgBtn.setOnClickListener(new View.OnClickListener() {
         @Override
@@ -41,6 +64,45 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
     } // end onCreate
 
+    private void refreshSMSInbox() {
+
+        Uri inboxURI = Uri.parse("content://sms/inbox");
+        String[] requestedColumns = new String[]{"_id", "address", "body"};
+        ContentResolver cr = getContentResolver();
+        Cursor smsInboxCursor = cr.query(inboxURI, requestedColumns, null, null,null);
+        int indexBody = smsInboxCursor.getColumnIndex("body");
+        int indexAddress = smsInboxCursor.getColumnIndex("address");
+
+        ArrayList <String> StoredPhoneNumbers = new ArrayList<String>();
+        ArrayList <Message> StoredMessages = new ArrayList<Message>();
+        ArrayList <Conversation> conversations = new ArrayList<Conversation>();
+        smsInboxCursor.moveToFirst(); // last text sent
+
+        if (indexBody < 0 ||  !smsInboxCursor.moveToNext()) return;
+        do {
+            if (!StoredPhoneNumbers.contains(smsInboxCursor.getString(indexAddress))){
+                StoredPhoneNumbers.add(smsInboxCursor.getString(indexAddress)); // add phone number
+            }
+            StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
+                smsInboxCursor.getString(indexBody)));    // add message
+
+        } while(smsInboxCursor.moveToNext());
+
+        for (String sNumber: StoredPhoneNumbers){   // group messages per phone number
+            ArrayList <String> numMessages = new ArrayList<String>();
+            for (Message m: StoredMessages){
+                if (m.getNumber().equals(sNumber)){
+                    numMessages.add(m.getBody());
+                }
+            }
+            conversations.add(new Conversation(sNumber, numMessages));
+        }
+
+        for (Conversation c: conversations) {
+            phoneNumber.add(c.getNumber());
+            messages.add(c.findLastMessage());
+        }
+    }
     /**
      * The following two methods create the menu of options in MainActivity
      * @param menu
