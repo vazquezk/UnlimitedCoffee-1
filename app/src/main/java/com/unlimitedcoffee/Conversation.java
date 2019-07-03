@@ -16,9 +16,10 @@ public class Conversation {
     }
 
     public void addMessage(String msg){
+
         messages.add(msg);
     }
     public String findLastMessage(){
-        return this.messages.get(this.messages.size()-1);
+        return this.messages.get(0);
     }
 }

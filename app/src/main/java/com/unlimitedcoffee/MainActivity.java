@@ -2,6 +2,7 @@ package com.unlimitedcoffee;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -58,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
         session = new SessionPreferences(getApplicationContext());
         session.checkLogin();
 
-        //text_Phone_Number = (EditText)findViewById(R.id.txt_phone_number);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         messages = (ListView) findViewById(R.id.messages);
@@ -113,17 +112,21 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onSendClick(View view) {
         String sentPhoneNumber = text_Phone_Number.getText().toString().trim();
-        String textMessage = input.getText().toString();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            getPermissionToReadSMS();
+        if ((text_Phone_Number.length() != 11) ){   // check for valid phone number entry
+            Toast.makeText(this, "Enter a valid Phone Number", Toast.LENGTH_SHORT).show();
         } else {
-            String encryptedText = TextEncryption.encrypt(textMessage);
-            smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
-            String decryptedText = TextEncryption.decrypt(encryptedText);
-            System.out.println(decryptedText);
-            Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
-            input.setText("");
+            String textMessage = input.getText().toString();
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                getPermissionToReadSMS();
+            } else {
+                String encryptedText = TextEncryption.encrypt(textMessage);
+                smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
+                String decryptedText = TextEncryption.decrypt(encryptedText);
+                System.out.println(decryptedText);
+                Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+                input.setText("");
+            }
         }
     }
 
@@ -156,8 +159,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-
-
 
     }
 

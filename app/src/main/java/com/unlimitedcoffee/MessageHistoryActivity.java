@@ -42,10 +42,9 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
         /*****/
         smsListView = (ListView) findViewById(R.id.lvMsg) ;
-
+        refreshSMSInbox();
         msgAdapter = new MessageHistAdapter (this, phoneNumber , messages);
         smsListView.setAdapter(msgAdapter);
-        refreshSMSInbox();
 
         /*****/
         // assign new message button
@@ -103,22 +102,41 @@ public class MessageHistoryActivity extends AppCompatActivity {
     }   // end menu option selection
 
 
-    private void refreshSMSInbox() {
+    @Override
+    public void onResume()
+    {  // After a pause OR at startup
+        super.onResume();
+        refreshSMSInbox();
+        msgAdapter = new MessageHistAdapter (this, phoneNumber , messages);
+        smsListView.setAdapter(msgAdapter);
+    }
 
-        Uri inboxURI = Uri.parse("content://sms/inbox");
+
+    /**
+     * This method refreshes the content of the inbox
+     *
+     */
+    private void refreshSMSInbox() {
+        phoneNumber.clear();
+        messages.clear();
+        ArrayList <String> StoredPhoneNumbers = new ArrayList<String>();
+        ArrayList <Message> StoredMessages = new ArrayList<Message>();
+        ArrayList <Conversation> conversations = new ArrayList<Conversation>();
+        //pooling text messages from the sms manager
+        Uri inboxURI = Uri.parse("content://sms");
         String[] requestedColumns = new String[]{"_id", "address", "body"};
         ContentResolver cr = getContentResolver();
         Cursor smsInboxCursor = cr.query(inboxURI, requestedColumns, null, null,null);
         int indexBody = smsInboxCursor.getColumnIndex("body");
         int indexAddress = smsInboxCursor.getColumnIndex("address");
 
-        ArrayList <String> StoredPhoneNumbers = new ArrayList<String>();
-        ArrayList <Message> StoredMessages = new ArrayList<Message>();
-        ArrayList <Conversation> conversations = new ArrayList<Conversation>();
         smsInboxCursor.moveToFirst(); // last text sent
 
+        // The next few lines are to group messages per phone number
         if (indexBody < 0 ||  !smsInboxCursor.moveToNext()) return;
+        smsInboxCursor.moveToFirst();
         do {
+
             if (!StoredPhoneNumbers.contains(smsInboxCursor.getString(indexAddress))){
                 StoredPhoneNumbers.add(smsInboxCursor.getString(indexAddress)); // add phone number
             }
@@ -137,7 +155,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
             conversations.add(new Conversation(sNumber, numMessages));
         }
 
-        for (Conversation c: conversations) {
+        for (Conversation c: conversations) {   // this returns the last phone
             phoneNumber.add(c.getNumber());
             messages.add(c.findLastMessage());
         }
