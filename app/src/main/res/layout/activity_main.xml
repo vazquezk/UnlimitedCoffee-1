@@ -16,7 +16,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:background="#d0d3ee"
+        android:background="@drawable/edit_text_border"
         android:gravity="top"
         android:hint="Enter message here..." />
 
@@ -40,6 +40,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:background="@drawable/edit_button_border"
+        android:textColor="#ffffffff"
         android:onClick="onSendClick" />
 
     <ListView
@@ -55,6 +57,6 @@
         android:layout_marginTop="48dp"
         android:layout_marginEnd="1dp"
         android:layout_marginRight="1dp"
-        android:background="#cdeede" />
+        android:background="@drawable/bean_background" />
 
 </RelativeLayout>
