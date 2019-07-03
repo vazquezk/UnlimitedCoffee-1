@@ -2,6 +2,7 @@ package com.unlimitedcoffee;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -110,17 +111,27 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onSendClick(View view) {
         String sentPhoneNumber = text_Phone_Number.getText().toString().trim();
-        String textMessage = input.getText().toString();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            getPermissionToReadSMS();
+        if ((text_Phone_Number.length() != 11) ){   // check for valid phone number entry
+            Toast.makeText(this, "Enter a valid Phone Number", Toast.LENGTH_SHORT).show();
         } else {
+<<<<<<< HEAD
             if (sentPhoneNumber.length() == 11) {
+=======
+            String textMessage = input.getText().toString();
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                getPermissionToReadSMS();
+            } else {
+>>>>>>> b513a76dbedff927caba7226b6401b071abb6987
                 String encryptedText = TextEncryption.encrypt(textMessage);
                 smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
                 String decryptedText = TextEncryption.decrypt(encryptedText);
                 System.out.println(decryptedText);
                 Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+<<<<<<< HEAD
+=======
+                input.setText("");
+>>>>>>> b513a76dbedff927caba7226b6401b071abb6987
             }
         }
     }
