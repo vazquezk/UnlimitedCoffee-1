@@ -31,7 +31,7 @@
         android:isScrollContainer="false"
         android:keepScreenOn="true"
         android:visibility="visible"
-        app:backgroundTint="#A9FF5722"
+        app:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.975"

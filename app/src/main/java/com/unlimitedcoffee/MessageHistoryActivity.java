@@ -41,7 +41,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message_history);
 
         /*****/
-        smsListView = (ListView) findViewById(R.id.lvMsg) ;
+        smsListView = (ListView) findViewById(R.id.lvMsg);
         refreshSMSInbox();
         msgAdapter = new MessageHistAdapter (this, phoneNumber , messages);
         smsListView.setAdapter(msgAdapter);
