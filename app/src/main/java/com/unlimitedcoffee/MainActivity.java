@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private static MainActivity inst;
 
     private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
+    private static final int SEND_SMS_PERMISSIONS_REQUEST = 1;
 
     public static MainActivity instance() {
         return inst;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
+
         } else {
             refreshSmsInbox();
         }
@@ -118,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Enter a valid Phone Number", Toast.LENGTH_SHORT).show();
         } else {
             String textMessage = input.getText().toString();
+            requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST);
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                     != PackageManager.PERMISSION_GRANTED) {
                 getPermissionToReadSMS();
