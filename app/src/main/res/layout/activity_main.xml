@@ -9,17 +9,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.unlimitedcoffee.MainActivity">
-
     <EditText
+        android:layout_width="250dp"
+        android:layout_height="90dp"
         android:id="@+id/input"
-        android:layout_width="293dp"
-        android:layout_height="73dp"
-        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:background="@drawable/edit_text_border"
-        android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"
         android:gravity="top"
         android:hint="Enter message here..." />
 
@@ -34,24 +31,18 @@
         />
 
     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
         android:id="@+id/send"
-        android:layout_width="98dp"
-        android:layout_height="85dp"
         android:layout_alignTop="@+id/input"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="3dp"
         android:layout_toRightOf="@+id/input"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:background="@drawable/edit_button_border"
-        android:clickable="true"
-        android:foreground="@drawable/icons8_text_send_32"
-        android:onClick="onSendClick"
-        android:textColor="#ffffffff" />
+        android:textColor="#ffffffff"
+        android:onClick="onSendClick" />
 
     <ListView
         android:id="@+id/messages"
