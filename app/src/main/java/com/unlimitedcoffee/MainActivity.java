@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,8 +31,9 @@ public class MainActivity extends AppCompatActivity {
     ListView messages;
     ArrayAdapter arrayAdapter;
     EditText input;
+    EditText text_Phone_Number;
     SmsManager smsManager = SmsManager.getDefault();
-    private String sentPhoneNumber = "+15555215554";
+
 
     private static MainActivity inst;
 
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         messages = (ListView) findViewById(R.id.messages);
         input = (EditText) findViewById(R.id.input);
+        text_Phone_Number = (EditText) findViewById(R.id.txt_phone_number);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, smsMessagesList);
         messages.setAdapter(arrayAdapter);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
@@ -66,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             refreshSmsInbox();
         }
-
 
     }
     /*
@@ -98,24 +102,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateInbox(final String smsMessage) {
+
         arrayAdapter.insert(smsMessage, 0);
         arrayAdapter.notifyDataSetChanged();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onSendClick(View view) {
+        String sentPhoneNumber = text_Phone_Number.getText().toString().trim();
         String textMessage = input.getText().toString();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
         } else {
-            String encryptedText = TextEncryption.encrypt(textMessage);
-            smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
-            String decryptedText = TextEncryption.decrypt(encryptedText);
-            System.out.println(decryptedText);
-            Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+            if (sentPhoneNumber.length() == 11) {
+                String encryptedText = TextEncryption.encrypt(textMessage);
+                smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
+                String decryptedText = TextEncryption.decrypt(encryptedText);
+                System.out.println(decryptedText);
+                Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(
@@ -144,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-
-
 
     }
 
