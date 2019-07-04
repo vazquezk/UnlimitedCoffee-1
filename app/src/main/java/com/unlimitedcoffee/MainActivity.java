@@ -1,7 +1,10 @@
+
+
 package com.unlimitedcoffee;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             refreshSmsInbox();
         }
 
+
     }
     /*
     The following two methods create the menu of options in MainActivity
@@ -110,17 +114,20 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onSendClick(View view) {
         String sentPhoneNumber = text_Phone_Number.getText().toString().trim();
-        String textMessage = input.getText().toString();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            getPermissionToReadSMS();
+        if ((sentPhoneNumber.isEmpty()) ){   // check for valid phone number entry
+            Toast.makeText(this, "Enter a valid Phone Number", Toast.LENGTH_SHORT).show();
         } else {
-            if (sentPhoneNumber.length() == 11) {
+            String textMessage = input.getText().toString();
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                getPermissionToReadSMS();
+            } else {
                 String encryptedText = TextEncryption.encrypt(textMessage);
                 smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
                 String decryptedText = TextEncryption.decrypt(encryptedText);
                 System.out.println(decryptedText);
                 Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+                input.setText("");
             }
         }
     }
