@@ -58,9 +58,8 @@ public class LoginActivity extends AppCompatActivity {
                 //If phone number and password are correct
                 if(res == true) {
                     session.createLoginSession(phoneNumber);
-                    //send the user to the message history page
-                    Intent messageHistApp = new Intent(LoginActivity.this, MessageHistoryActivity.class);
-                    startActivity(messageHistApp);
+                    Intent smsApp = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(smsApp);
 
                 }else{
                     Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
