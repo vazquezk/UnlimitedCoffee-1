@@ -54,4 +54,6 @@ public class MessageHistAdapter extends BaseAdapter {
 
         return v; // returns the view
     }
+
+
 }
