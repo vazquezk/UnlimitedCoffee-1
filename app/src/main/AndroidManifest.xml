@@ -19,11 +19,9 @@
             android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <receiver
             android:name=".SmsBroadcastReceiver"
             android:exported="true">
@@ -38,5 +36,4 @@
         <activity android:name=".ContactsSearchActivity"
             android:theme="@style/contacts_search"></activity>
     </application>
-
 </manifest>

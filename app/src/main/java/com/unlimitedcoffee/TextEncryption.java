@@ -1,6 +1,6 @@
 package com.unlimitedcoffee;
 
-import android.util.Base64;
+//import android.util.Base64;
 import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
@@ -15,6 +15,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import org.apache.commons.codec.binary.Base64;
 
 public abstract class TextEncryption {
     private static final byte[] KEY = Hide.getKey();
@@ -31,7 +32,7 @@ public abstract class TextEncryption {
             Cipher cipher = Cipher.getInstance("DES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
 
-            String encrypedText = Base64.encodeToString(cipher.doFinal(clearText), Base64.DEFAULT);
+            String encrypedText = Base64.encodeBase64String(cipher.doFinal(clearText));
             Log.d("Oh snap!", "Encrypted: " + value + " -> " + encrypedText);
             return encrypedText;
 
@@ -42,24 +43,31 @@ public abstract class TextEncryption {
     }
 
     public static String decrypt(String value) {
-        try {
-            DESKeySpec keySpec = new DESKeySpec(KEY);
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-            SecretKey key = keyFactory.generateSecret(keySpec);
+        if (Base64.isBase64(value)) {
+            try {
 
-            byte[] encrypedPwdBytes = Base64.decode(value, Base64.DEFAULT);
-            // Implement this in a thread safe way, or switch to AES.
-            Cipher cipher = Cipher.getInstance("DES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
+                DESKeySpec keySpec = new DESKeySpec(KEY);
+                SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+                SecretKey key = keyFactory.generateSecret(keySpec);
 
-            String decrypedText = new String(decrypedValueBytes);
-            Log.d("Oh snap!", "Decrypted: " + value + " -> " + decrypedText);
-            return decrypedText;
+                byte[] encrypedPwdBytes = Base64.decodeBase64(value);
+                // Implement this in a thread safe way, or switch to AES.
+                Cipher cipher = Cipher.getInstance("DES");
+                cipher.init(Cipher.DECRYPT_MODE, key);
+                byte[] decrypedValueBytes = (cipher.doFinal(encrypedPwdBytes));
 
-        } catch (InvalidKeyException | InvalidKeySpecException | NoSuchAlgorithmException| BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException  e) {
-            e.printStackTrace();
+                String decrypedText = new String(decrypedValueBytes);
+                Log.d("Oh snap!", "Decrypted: " + value + " -> " + decrypedText);
+                return decrypedText;
+
+            } catch (InvalidKeyException | InvalidKeySpecException | NoSuchAlgorithmException | BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            System.out.println("Not a string!");
         }
         return value;
     }
 }
+
