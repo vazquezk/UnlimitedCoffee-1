@@ -9,9 +9,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -40,13 +44,12 @@ public class MessageHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_history);
 
-        /*****/
         smsListView = (ListView) findViewById(R.id.lvMsg);
+        registerForContextMenu(smsListView);
         refreshSMSInbox();
         msgAdapter = new MessageHistAdapter (this, phoneNumber , messages);
         smsListView.setAdapter(msgAdapter);
 
-        /*****/
         // assign new message button
         newMsgBtn = (FloatingActionButton) findViewById(R.id.newMsgBtn);
         //send user to new message entry page
@@ -57,8 +60,45 @@ public class MessageHistoryActivity extends AppCompatActivity {
             startActivity(toNewMessage);
         }
         }); // end newMsgBtn onClick
+        smsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("HelloListView", "You clicked Item: " + id + " at position:" + position);
+                Intent toMessageThread = new Intent(MessageHistoryActivity.this, MainActivity.class);
+                //intent.putExtra("position", position);
+                // Or / And
+                //intent.putExtra("id", id);
+                startActivity(toMessageThread);
+            }
+        });
 
     } // end onCreate
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId()==R.id.lvMsg) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.context_menu_hist, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        //AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        switch(item.getItemId()) {
+            case R.id.Open_menu:
+                Intent toNewMessage = new Intent(MessageHistoryActivity.this, MainActivity.class);
+                startActivity(toNewMessage);
+                return true;
+            case R.id.Delete_menu:
+                // remove stuff here
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
 
     /**
      * The following two methods create the menu of options in MainActivity
@@ -101,7 +141,9 @@ public class MessageHistoryActivity extends AppCompatActivity {
         }   // end switch
     }   // end menu option selection
 
-
+    /**
+     * This method refreshes the list display
+     */
     @Override
     public void onResume()
     {  // After a pause OR at startup
