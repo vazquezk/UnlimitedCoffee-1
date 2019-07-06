@@ -1,10 +1,7 @@
-
-
 package com.unlimitedcoffee;
 
 import android.Manifest;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
