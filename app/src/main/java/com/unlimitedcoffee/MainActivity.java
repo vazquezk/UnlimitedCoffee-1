@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,13 +30,14 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
     ArrayAdapter arrayAdapter;
-    EditText input, text_Phone_Number;
+    EditText input;
+    EditText text_Phone_Number;
     SmsManager smsManager = SmsManager.getDefault();
 
 
     private static MainActivity inst;
 
-    private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
+    private static final int SEND_SMS_PERMISSIONS_REQUEST = 1;
 
     public static MainActivity instance() {
         return inst;
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -54,21 +58,30 @@ public class MainActivity extends AppCompatActivity {
         session = new SessionPreferences(getApplicationContext());
         session.checkLogin();
 
-        text_Phone_Number = (EditText)findViewById(R.id.txt_phone_number);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         messages = (ListView) findViewById(R.id.messages);
         input = (EditText) findViewById(R.id.input);
+        text_Phone_Number = (EditText) findViewById(R.id.txt_phone_number);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, smsMessagesList);
         messages.setAdapter(arrayAdapter);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
+
+
+        if (getIntent().hasExtra("com.unlimitedcoffee.SELECTED_NUMBER")) {
+            String incomingNumber = getIntent().getStringExtra("com.unlimitedcoffee.SELECTED_NUMBER");
+            text_Phone_Number.setText(incomingNumber);  // transfers
+            text_Phone_Number.setEnabled(false);
+        } else {
+            text_Phone_Number.setText("");
+        }
+
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
-            getPermissionToReadSMS();
+            getPermissionToSendSMS();
         } else {
             refreshSmsInbox();
         }
-
 
     }
     /*
@@ -105,28 +118,36 @@ public class MainActivity extends AppCompatActivity {
         arrayAdapter.notifyDataSetChanged();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onSendClick(View view) {
         String sentPhoneNumber = text_Phone_Number.getText().toString().trim();
-        String textMessage = input.getText().toString();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            getPermissionToReadSMS();
+        if ((sentPhoneNumber.isEmpty()) ){   // check for valid phone number entry
+            Toast.makeText(this, "Enter a valid Phone Number", Toast.LENGTH_SHORT).show();
         } else {
-            String encryptedText = TextEncryption.encrypt(textMessage);
-            smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
-            String decryptedText = TextEncryption.decrypt(encryptedText);
-            System.out.println(decryptedText);
-            Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+            String textMessage = input.getText().toString();
+            requestPermissions(new String[]{Manifest.permission.SEND_SMS}, SEND_SMS_PERMISSIONS_REQUEST);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                getPermissionToSendSMS();
+            } else {
+                String encryptedText = TextEncryption.encrypt(textMessage);
+                smsManager.sendTextMessage(sentPhoneNumber, null, encryptedText, null, null);
+                String decryptedText = TextEncryption.decrypt(encryptedText);
+                System.out.println(decryptedText);
+                Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+                input.setText("");
+            }
         }
     }
 
-    public void getPermissionToReadSMS() {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void getPermissionToSendSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(
                     Manifest.permission.READ_SMS)) {
                 Toast.makeText(this, "Please allow permission!", Toast.LENGTH_SHORT).show();
             }
-            requestPermissions(new String[]{Manifest.permission.READ_SMS}, READ_SMS_PERMISSIONS_REQUEST);
+            requestPermissions(new String[]{Manifest.permission.READ_SMS}, SEND_SMS_PERMISSIONS_REQUEST);
         }
     }
 
@@ -136,38 +157,48 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
         // Make sure it's our original READ_CONTACTS request
-        if (requestCode == READ_SMS_PERMISSIONS_REQUEST) {
+        if (requestCode == SEND_SMS_PERMISSIONS_REQUEST) {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Read SMS permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Send SMS permission granted", Toast.LENGTH_SHORT).show();
                 refreshSmsInbox();
             } else {
-                Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Send SMS permission denied", Toast.LENGTH_SHORT).show();
             }
 
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-
-
     }
 
     public void refreshSmsInbox() {
         ContentResolver contentResolver = getContentResolver();
-        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        String[] requestedColumns = new String[]{"_id", "address", "body", "type"};
+        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms"), requestedColumns,
+                null , null, null);
         int indexBody = smsInboxCursor.getColumnIndex("body");
         int indexAddress = smsInboxCursor.getColumnIndex("address");
+        int indexType = smsInboxCursor.getColumnIndex("type");// 2 = sent, etc.)
         if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
         arrayAdapter.clear();
         do {
-            String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                    "\n" + smsInboxCursor.getString(indexBody) + "\n";
-            arrayAdapter.add(str);
+            if (smsInboxCursor.getString(indexAddress).equals(text_Phone_Number.getText().toString())) {
+                if (smsInboxCursor.getString(indexType).equals("1")) {
+                    String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
+                            "\n" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody)) + "\n";
+                    arrayAdapter.add(str);
+                }
+
+                if (smsInboxCursor.getString(indexType).equals("2")) {
+                    String str = "SMS To: " + smsInboxCursor.getString(indexAddress) +
+                            "\n" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody)) + "\n";
+                    arrayAdapter.add(str);
+                }
+
+            }
         } while (smsInboxCursor.moveToNext());
         //messages.setSelection(arrayAdapter.getCount() - 1);
     }
-
-
 
 }
