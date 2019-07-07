@@ -6,7 +6,7 @@
     tools:context="com.unlimitedcoffee.RegisterActivity"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:background="@drawable/bean_background">
+    >
 
     <EditText
         android:id="@+id/edittext_username"
