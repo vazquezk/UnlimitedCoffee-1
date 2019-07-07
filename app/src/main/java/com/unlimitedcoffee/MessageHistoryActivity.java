@@ -100,16 +100,19 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        //AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();    // get ID from adapter
+        final int index = (int) info.id;
         switch(item.getItemId()) {
             case R.id.Open_menu:
+                ArrayList <String> selectedMsg = new ArrayList<>();
+                selectedMsg = conversations.get(index).getMessages();
                 Intent toNewMessage = new Intent(MessageHistoryActivity.this, MainActivity.class);
+                toNewMessage.putExtra("SELECTED_MESSAGE", selectedMsg);
                 startActivity(toNewMessage);
                 return true;
             case R.id.Delete_menu:
-                AdapterView.AdapterContextMenuInfo info =
-                        (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();    // get ID from adapter
-                final int index = (int) info.id;
+
                 deleteMessageThread(index); // delete thread with provided id
                 return true;
             default:
