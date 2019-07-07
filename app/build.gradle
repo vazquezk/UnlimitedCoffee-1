@@ -16,6 +16,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -26,4 +29,9 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.9.9'
     implementation files('libs/jbcrypt-1.0.0.jar')
+    // Robolectric environment
+    testImplementation 'androidx.test:core:1.0.0'
+    // Mockito framework
+    testImplementation 'org.mockito:mockito-core:1.10.19'
+
 }
