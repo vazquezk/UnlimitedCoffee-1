@@ -50,7 +50,7 @@ public class MessageHistAdapter extends BaseAdapter {
 
         // set the textviews with the string data
         phoneNumTextView.setText(phoneNum);
-        messageTextView.setText(TextEncryption.decrypt(msg));
+        messageTextView.setText(msg);
 
         return v; // returns the view
     }

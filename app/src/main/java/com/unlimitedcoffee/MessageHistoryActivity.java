@@ -70,6 +70,8 @@ public class MessageHistoryActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("HelloListView", "You clicked Item: " + id + " at position:" + position);
                 Intent toMessageThread = new Intent(MessageHistoryActivity.this, MainActivity.class);
+                String selectedMsg = conversations.get(position).getNumber();
+                toMessageThread.putExtra("com.unlimitedcoffee.SELECTED_NUMBER", selectedMsg);
                 startActivity(toMessageThread);
             }
         });
@@ -100,16 +102,19 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        //AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();    // get ID from adapter
+        final int index = (int) info.id;
         switch(item.getItemId()) {
             case R.id.Open_menu:
+
                 Intent toNewMessage = new Intent(MessageHistoryActivity.this, MainActivity.class);
+                String selectedMsg = conversations.get(index).getNumber();
+                toNewMessage.putExtra("com.unlimitedcoffee.SELECTED_NUMBER", selectedMsg);
                 startActivity(toNewMessage);
                 return true;
             case R.id.Delete_menu:
-                AdapterView.AdapterContextMenuInfo info =
-                        (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();    // get ID from adapter
-                final int index = (int) info.id;
+
                 deleteMessageThread(index); // delete thread with provided id
                 return true;
             default:
@@ -185,12 +190,12 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
         //pooling text messages from the sms manager
         Uri inboxURI = Uri.parse("content://sms");
-        String[] requestedColumns = new String[]{"_id", "address", "body"};
+        String[] requestedColumns = new String[]{"_id", "address", "body", "type"};
         ContentResolver cr = getContentResolver();
         Cursor smsInboxCursor = cr.query(inboxURI, requestedColumns, null, null,null);
         int indexBody = smsInboxCursor.getColumnIndex("body");
         int indexAddress = smsInboxCursor.getColumnIndex("address");
-
+        int indexType = smsInboxCursor.getColumnIndex("type");// 2 = sent, etc.)
         smsInboxCursor.moveToFirst(); // last text sent
 
         // The next few lines are to group messages per phone number
@@ -201,13 +206,18 @@ public class MessageHistoryActivity extends AppCompatActivity {
             if (!StoredPhoneNumbers.contains(smsInboxCursor.getString(indexAddress))){
                 StoredPhoneNumbers.add(smsInboxCursor.getString(indexAddress)); // add phone number
             }
-            StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
-                    smsInboxCursor.getString(indexBody)));    // add message
+            if (smsInboxCursor.getString(indexType).equals("1")) {
+                StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
+                        "Received : " + TextEncryption.decrypt(smsInboxCursor.getString(indexBody))));    // add message
+            }
+            if (smsInboxCursor.getString(indexType).equals("2")) {
+                StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
+                        "You :" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody))));    // add message
+            }
 
         } while(smsInboxCursor.moveToNext());
 
         for (String sNumber: StoredPhoneNumbers) {   // group messages per phone number]
-
             ArrayList<String> numMessages = new ArrayList<String>();
             for (Message m : StoredMessages) {
                 if (m.getNumber().equals(sNumber)) {
@@ -226,7 +236,6 @@ public class MessageHistoryActivity extends AppCompatActivity {
     private void refreshSMSInbox() {
         phoneNumber.clear();
         messages.clear();
-
 
         for (Conversation c: conversations) {   // this returns the last phone number and conversation
             phoneNumber.add(c.getNumber());
