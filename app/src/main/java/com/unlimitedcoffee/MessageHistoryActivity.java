@@ -190,12 +190,12 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
         //pooling text messages from the sms manager
         Uri inboxURI = Uri.parse("content://sms");
-        String[] requestedColumns = new String[]{"_id", "address", "body"};
+        String[] requestedColumns = new String[]{"_id", "address", "body", "type"};
         ContentResolver cr = getContentResolver();
         Cursor smsInboxCursor = cr.query(inboxURI, requestedColumns, null, null,null);
         int indexBody = smsInboxCursor.getColumnIndex("body");
         int indexAddress = smsInboxCursor.getColumnIndex("address");
-
+        int indexType = smsInboxCursor.getColumnIndex("type");// 2 = sent, etc.)
         smsInboxCursor.moveToFirst(); // last text sent
 
         // The next few lines are to group messages per phone number
@@ -206,13 +206,18 @@ public class MessageHistoryActivity extends AppCompatActivity {
             if (!StoredPhoneNumbers.contains(smsInboxCursor.getString(indexAddress))){
                 StoredPhoneNumbers.add(smsInboxCursor.getString(indexAddress)); // add phone number
             }
-            StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
-                    smsInboxCursor.getString(indexBody)));    // add message
+            if (smsInboxCursor.getString(indexType).equals("1")) {
+                StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
+                        "Received : " + TextEncryption.decrypt(smsInboxCursor.getString(indexBody))));    // add message
+            }
+            if (smsInboxCursor.getString(indexType).equals("2")) {
+                StoredMessages.add(new Message(smsInboxCursor.getString(indexAddress),
+                        "You :" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody))));    // add message
+            }
 
         } while(smsInboxCursor.moveToNext());
 
         for (String sNumber: StoredPhoneNumbers) {   // group messages per phone number]
-
             ArrayList<String> numMessages = new ArrayList<String>();
             for (Message m : StoredMessages) {
                 if (m.getNumber().equals(sNumber)) {
@@ -231,7 +236,6 @@ public class MessageHistoryActivity extends AppCompatActivity {
     private void refreshSMSInbox() {
         phoneNumber.clear();
         messages.clear();
-
 
         for (Conversation c: conversations) {   // this returns the last phone number and conversation
             phoneNumber.add(c.getNumber());

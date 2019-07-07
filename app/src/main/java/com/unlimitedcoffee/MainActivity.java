@@ -174,19 +174,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void refreshSmsInbox() {
         ContentResolver contentResolver = getContentResolver();
-        String[] requestedColumns = new String[]{"_id", "address", "body"};
+        String[] requestedColumns = new String[]{"_id", "address", "body", "type"};
         Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms"), requestedColumns,
                 null , null, null);
         int indexBody = smsInboxCursor.getColumnIndex("body");
         int indexAddress = smsInboxCursor.getColumnIndex("address");
-
+        int indexType = smsInboxCursor.getColumnIndex("type");// 2 = sent, etc.)
         if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
         arrayAdapter.clear();
         do {
             if (smsInboxCursor.getString(indexAddress).equals(text_Phone_Number.getText().toString())) {
-                String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                        "\n" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody)) + "\n";
-                arrayAdapter.add(str);
+                if (smsInboxCursor.getString(indexType).equals("1")) {
+                    String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
+                            "\n" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody)) + "\n";
+                    arrayAdapter.add(str);
+                }
+
+                if (smsInboxCursor.getString(indexType).equals("2")) {
+                    String str = "SMS To: " + smsInboxCursor.getString(indexAddress) +
+                            "\n" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody)) + "\n";
+                    arrayAdapter.add(str);
+                }
+
             }
         } while (smsInboxCursor.moveToNext());
         //messages.setSelection(arrayAdapter.getCount() - 1);
