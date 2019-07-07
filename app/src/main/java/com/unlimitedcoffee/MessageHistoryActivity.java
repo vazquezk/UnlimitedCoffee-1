@@ -70,6 +70,8 @@ public class MessageHistoryActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("HelloListView", "You clicked Item: " + id + " at position:" + position);
                 Intent toMessageThread = new Intent(MessageHistoryActivity.this, MainActivity.class);
+                String selectedMsg = conversations.get(position).getNumber();
+                toMessageThread.putExtra("com.unlimitedcoffee.SELECTED_NUMBER", selectedMsg);
                 startActivity(toMessageThread);
             }
         });
@@ -105,10 +107,10 @@ public class MessageHistoryActivity extends AppCompatActivity {
         final int index = (int) info.id;
         switch(item.getItemId()) {
             case R.id.Open_menu:
-                ArrayList <String> selectedMsg = new ArrayList<>();
-                selectedMsg = conversations.get(index).getMessages();
+
                 Intent toNewMessage = new Intent(MessageHistoryActivity.this, MainActivity.class);
-                toNewMessage.putExtra("SELECTED_MESSAGE", selectedMsg);
+                String selectedMsg = conversations.get(index).getNumber();
+                toNewMessage.putExtra("com.unlimitedcoffee.SELECTED_NUMBER", selectedMsg);
                 startActivity(toNewMessage);
                 return true;
             case R.id.Delete_menu:
