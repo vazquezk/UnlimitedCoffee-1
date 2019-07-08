@@ -185,11 +185,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // eval query results
             if (cursor.moveToFirst()) {
                 System.out.println("**********Check 2");//***************************************
-                int colIndex = cursor.getColumnIndex("Time");
+                int colIndex = cursor.getColumnIndex("time");
                 do {
+                    System.out.println("**********Check 3a");//***************************************
                     String failTimeStr;
                     failTimeStr = cursor.getString(colIndex);
-                    System.out.println("**********Check 3: failTimeStr = " + failTimeStr); //***************************************
+                    System.out.println("**********Check 3b: failTimeStr = " + failTimeStr); //***************************************
                     try { // parse string to Date object
                         System.out.println("**********Check 4"); //***************************************
                         thenTime = dateFormat.parse(failTimeStr);
