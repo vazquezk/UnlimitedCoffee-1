@@ -91,7 +91,9 @@ public class LoginActivity extends AppCompatActivity {
                     Intent messageHistApp = new Intent(LoginActivity.this, MessageHistoryActivity.class);
                     startActivity(messageHistApp);
 
-                }else{
+                }else{ // credentials are invalid
+                    event = "failed login";
+                    db.logEvent(phoneNumber, time, event);
                     Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
                 }
             }

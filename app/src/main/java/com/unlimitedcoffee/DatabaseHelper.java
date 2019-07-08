@@ -171,7 +171,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // set up db query for time of failed events - where phone# matches and event = 'Failed Login'
             String[] columns = {COL_LOG_TIME};
-            String selection = COL_LOG_PHONE + "=? &" + COL_LOG_EVENT + "=?";
+            String selection = COL_LOG_PHONE + "=? &&" + COL_LOG_EVENT + "=?";
             String[] selectionArgs = {phoneNumber, event};
             int failCount = 0;
 
