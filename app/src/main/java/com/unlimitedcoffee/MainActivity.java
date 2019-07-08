@@ -66,6 +66,16 @@ public class MainActivity extends AppCompatActivity {
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, smsMessagesList);
         messages.setAdapter(arrayAdapter);
 
+
+        if (getIntent().hasExtra("com.unlimitedcoffee.SELECTED_NUMBER")) {
+            String incomingNumber = getIntent().getStringExtra("com.unlimitedcoffee.SELECTED_NUMBER");
+            text_Phone_Number.setText(incomingNumber);  // transfers
+            text_Phone_Number.setEnabled(false);
+        } else {
+            text_Phone_Number.setText("");
+        }
+
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToSendSMS();
@@ -164,15 +174,29 @@ public class MainActivity extends AppCompatActivity {
 
     public void refreshSmsInbox() {
         ContentResolver contentResolver = getContentResolver();
-        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        String[] requestedColumns = new String[]{"_id", "address", "body", "type"};
+        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms"), requestedColumns,
+                null , null, null);
         int indexBody = smsInboxCursor.getColumnIndex("body");
         int indexAddress = smsInboxCursor.getColumnIndex("address");
+        int indexType = smsInboxCursor.getColumnIndex("type");// 2 = sent, etc.)
         if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
         arrayAdapter.clear();
         do {
-            String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                    "\n" + smsInboxCursor.getString(indexBody) + "\n";
-            arrayAdapter.add(str);
+            if (smsInboxCursor.getString(indexAddress).equals(text_Phone_Number.getText().toString())) {
+                if (smsInboxCursor.getString(indexType).equals("1")) {
+                    String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
+                            "\n" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody)) + "\n";
+                    arrayAdapter.add(str);
+                }
+
+                if (smsInboxCursor.getString(indexType).equals("2")) {
+                    String str = "SMS To: " + smsInboxCursor.getString(indexAddress) +
+                            "\n" + TextEncryption.decrypt(smsInboxCursor.getString(indexBody)) + "\n";
+                    arrayAdapter.add(str);
+                }
+
+            }
         } while (smsInboxCursor.moveToNext());
         //messages.setSelection(arrayAdapter.getCount() - 1);
     }
