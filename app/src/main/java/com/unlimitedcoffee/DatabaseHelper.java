@@ -9,6 +9,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final byte[] databaseBytes = Hide.getDatabaseName();
@@ -143,4 +148,77 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             System.out.println("E's logEvent Error: " + e);
         }
     }// end logEvent method
+
+    /**
+     * checkAccount() - compares phone number to Login table, looks for 'Locked' event w/in past 15 min
+     *  account is unlocked = true, account is locked = false
+     */
+    public boolean checkAccountStatus(String phoneNumber) throws SQLiteException {
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String now = Utilities.getTimeStr();
+            Date nowTime = new Date();
+            Date thenTime;
+            String event = "Failed Login";
+
+            // convert string to DateTime obj
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+            try{
+                nowTime = dateFormat.parse(now);
+            } catch (ParseException e) {
+                System.out.println("checkLockout Error: " + e);
+            }
+
+            // set up db query for time of failed events - where phone# matches and event = 'Failed Login'
+            String[] columns = {COL_LOG_TIME};
+            String selection = COL_LOG_PHONE + "=? &&" + COL_LOG_EVENT + "=?";
+            String[] selectionArgs = {phoneNumber, event};
+            int failCount = 0;
+
+            // query the db
+            Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+            // eval query results
+            if (cursor.moveToFirst()) {
+                int colIndex = cursor.getColumnIndex("Time");
+                do {
+                    String failTimeStr;
+                    failTimeStr = cursor.getString(colIndex);
+                    try { // parse string to Date object
+                        thenTime = dateFormat.parse(failTimeStr);
+                    } catch (ParseException e) {
+                        System.out.println("checkLockout Error: " + e);
+                        return false; // assume locked if error
+                    }
+                    if (thenTime != null ){
+                        // subtract then time from now time to determine difference in millis
+                        long diff = nowTime.getTime() - thenTime.getTime();
+                        //convert to mins
+                        long diffMinutes = diff / (60 * 1000) % 60;
+                        // increment failCount if happened in past 15 mins
+                        if (diffMinutes < 15) {
+                            failCount++;
+                        }
+                    } else {
+                        System.out.println("checkLockoutError: There is no thenTime"); //***********************************
+                    }
+
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+
+            if (failCount > 3) { // user is locked, return true
+                System.out.println("1. User is locked"); //***********************************
+                return false;
+
+            } else { // user is not locked
+                System.out.println("2. User is NOT locked"); //***********************************
+                return true;
+            }
+        } catch (SQLiteException e) {
+            System.out.println("3. E's lockout error - checkLockout() failed, Exception: " + e);
+            return false; // assume locked if error
+        }
+
+    } // end checkLockout method
 }

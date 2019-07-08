@@ -70,6 +70,16 @@ public class LoginActivity extends AppCompatActivity {
                 String password = Utilities.sanitize(mTextPassword.getText().toString());
                 String event;
                 String time = Utilities.getTimeStr(); // gets current time as string
+
+                // check lockout
+                boolean lockStatus = db.checkAccountStatus(phoneNumber); //true = no lock on account, OK to proceed
+
+                if (!lockStatus) { //false = locked account, back to the Login Page
+                    Toast.makeText(LoginActivity.this, "Account Locked", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Account is *NOT* Locked", Toast.LENGTH_SHORT).show();
+                }
+
                 Boolean result = db.checkUser(phoneNumber,password); // validates phone / pword combo
 
                 if(result) { // credentials are valid
