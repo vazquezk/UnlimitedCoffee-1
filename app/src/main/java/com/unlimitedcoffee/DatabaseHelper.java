@@ -183,23 +183,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 do {
                     String failTimeStr;
                     failTimeStr = cursor.getString(colIndex);
+                    System.out.println("**********Check 1: failTimeStr = " + failTimeStr); //***************************************
                     try { // parse string to Date object
+                        System.out.println("**********Check 2"); //***************************************
                         thenTime = dateFormat.parse(failTimeStr);
                     } catch (ParseException e) {
                         System.out.println("checkLockout Error: " + e);
+                        System.out.println("**********Check 3"); //***************************************
                         return false; // assume locked if error
                     }
                     if (thenTime != null ){
+                        System.out.println("**********Check 4"); //***************************************
                         // subtract then time from now time to determine difference in millis
                         long diff = nowTime.getTime() - thenTime.getTime();
+                        System.out.println("**********Check 5: diff in milli = " + diff); //***************************************
                         //convert to mins
                         long diffMinutes = diff / (60 * 1000) % 60;
+                        System.out.println("**********Check 5: diff in mins = " + diffMinutes); //***************************************
                         // increment failCount if happened in past 15 mins
                         if (diffMinutes < 15) {
                             failCount++;
+                            System.out.println("**********Check 5A: failcount = " + failCount); //***************************************
                         }
                     } else {
                         System.out.println("checkLockoutError: There is no thenTime"); //***********************************
+                        System.out.println("**********Check 6"); //***************************************
                     }
 
                 } while (cursor.moveToNext());
@@ -208,15 +216,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.close();
 
             if (failCount > 3) { // user is locked, return true
-                System.out.println("1. User is locked"); //***********************************
+                System.out.println("******************1. User is locked"); //***********************************
                 return false;
 
             } else { // user is not locked
-                System.out.println("2. User is NOT locked"); //***********************************
+                System.out.println("******************2. User is NOT locked"); //***********************************
                 return true;
             }
         } catch (SQLiteException e) {
-            System.out.println("3. E's lockout error - checkLockout() failed, Exception: " + e);
+            System.out.println("***********************3. E's lockout error - checkLockout() failed, Exception: " + e);
             return false; // assume locked if error
         }
 
