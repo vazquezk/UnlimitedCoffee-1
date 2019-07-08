@@ -176,7 +176,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int failCount = 0;
 
             // query the db
-            Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+            Cursor cursor = db.query(TABLE_NAME2, columns, selection, selectionArgs, null, null, null);
             // eval query results
             if (cursor.moveToFirst()) {
                 int colIndex = cursor.getColumnIndex("Time");
