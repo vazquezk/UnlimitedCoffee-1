@@ -159,7 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String now = Utilities.getTimeStr();
             Date nowTime = new Date();
             Date thenTime;
-            String event = "Failed Login";
+            String event = "failed login";
 
             // convert string to DateTime obj
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
