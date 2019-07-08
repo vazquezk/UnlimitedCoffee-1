@@ -178,9 +178,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             System.out.println("**********Check 0");//***************************************
             // query the db
             Cursor cursor = db.query(TABLE_NAME2, columns, selection, selectionArgs, null, null, null);
-            if (cursor) {
-                System.out.println("**********Check 0A: query executed");//***************************************
-            }
+
             System.out.println("**********Check 1");//***************************************
             // eval query results
             if (cursor.moveToFirst()) {
