@@ -78,8 +78,6 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Account Locked", Toast.LENGTH_SHORT).show();
 
                 } else { // true = unlocked account, proceed with user authentication
-                    Toast.makeText(LoginActivity.this, "Account is *NOT* Locked", Toast.LENGTH_SHORT).show(); //********************
-
                     Boolean result = db.checkUser(phoneNumber,password); // validates phone / pword combo
 
                     if(result) { // credentials are valid
@@ -90,7 +88,6 @@ public class LoginActivity extends AppCompatActivity {
                         //send the user to the message history page
                         Intent messageHistApp = new Intent(LoginActivity.this, MessageHistoryActivity.class);
                         startActivity(messageHistApp);
-
                     }else{ // credentials are invalid
                         event = "failed login";
                         db.logEvent(phoneNumber, time, event);
@@ -99,8 +96,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onSendClick(View view) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)

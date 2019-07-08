@@ -150,7 +150,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }// end logEvent method
 
     /**
-     * checkAccount() - compares phone number to Login table, looks for 'Locked' event w/in past 15 min
+     * checkAccountStatus() - compares phone number to Login table, looks for 'failed login' events w/in past 5 min
      *  account is unlocked = true, account is locked = false
      */
     public boolean checkAccountStatus(String phoneNumber) throws SQLiteException {
@@ -159,7 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String now = Utilities.getTimeStr();
             Date nowTime = new Date();
             Date thenTime;
-            String event = "failed login";
+            String event = "failed login"; //looking for failed logins in db query return
 
             // convert string to DateTime obj
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
@@ -175,47 +175,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String[] selectionArgs = {phoneNumber, event};
             int failCount = 0;
 
-            System.out.println("**********Check 0");//***************************************
             // query the db
             Cursor cursor = db.query(TABLE_NAME2, columns, selection, selectionArgs, null, null, null);
-            int count = cursor.getCount(); // ****************************************************
-            System.out.println("**********Cursor count = " + count);//***************************************
 
-            System.out.println("**********Check 1");//***************************************
             // eval query results
             if (cursor.moveToFirst()) {
-                System.out.println("**********Check 2a");//***************************************
                 int colIndex = cursor.getColumnIndex("time");
-                System.out.println("**********Check 2b");//***************************************
                 do {
-                    System.out.println("**********Check 3a");//***************************************
                     String failTimeStr;
                     failTimeStr = cursor.getString(colIndex);
-                    System.out.println("**********Check 3b: failTimeStr = " + failTimeStr); //***************************************
                     try { // parse string to Date object
-                        System.out.println("**********Check 4"); //***************************************
                         thenTime = dateFormat.parse(failTimeStr);
                     } catch (ParseException e) {
-                        System.out.println("checkLockout Error: " + e);
-                        System.out.println("**********Check 3"); //***************************************
+                        System.out.println("Error: Exception " + e);
                         return false; // assume locked if error
                     }
+
                     if (thenTime != null ){
-                        System.out.println("**********Check 4"); //***************************************
                         // subtract then time from now time to determine difference in millis
                         long diff = nowTime.getTime() - thenTime.getTime();
-                        System.out.println("**********Check 5: diff in milli = " + diff); //***************************************
                         //convert to mins
                         long diffMinutes = diff / (60 * 1000) % 60;
-                        System.out.println("**********Check 5: diff in mins = " + diffMinutes); //***************************************
-                        // increment failCount if happened in past 5 mins
-                        if (diffMinutes < 5) {
+
+                        if (diffMinutes < 5) { // increment failCount if 'failed login' event in past 5 mins
                             failCount++;
-                            System.out.println("**********Check 5A: failcount = " + failCount); //***************************************
                         }
-                    } else {
-                        System.out.println("checkLockoutError: There is no thenTime"); //***********************************
-                        System.out.println("**********Check 6"); //***************************************
                     }
 
                 } while (cursor.moveToNext());
@@ -223,16 +207,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
             db.close();
 
-            if (failCount > 2) { // user is locked, return true
-                System.out.println("******************1. User is locked"); //***********************************
+            if (failCount > 2) { // user is locked, return false
                 return false;
-
             } else { // user is not locked
-                System.out.println("******************2. User is NOT locked"); //***********************************
                 return true;
             }
         } catch (SQLiteException e) {
-            System.out.println("***********************3. E's lockout error - checkLockout() failed, Exception: " + e);
+            System.out.println("Error: Exception " + e);
             return false; // assume locked if error
         }
 
