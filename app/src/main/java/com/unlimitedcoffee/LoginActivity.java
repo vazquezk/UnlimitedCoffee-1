@@ -96,13 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                         db.logEvent(phoneNumber, time, event);
                         Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
                     }
-
-
-
-
                 }
-
-
             }
         });
 
