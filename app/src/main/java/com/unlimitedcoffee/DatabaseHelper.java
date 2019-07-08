@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -12,20 +13,34 @@ import org.mindrot.jbcrypt.BCrypt;
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final byte[] databaseBytes = Hide.getDatabaseName();
     public static final String databaseName = new String(databaseBytes);
-    //Database name and columns
+    // vars for DB, User table
     public static final String DATABASE_NAME = databaseName;
-    public static final String TABLE_NAME = "user";
     public static final int DATABASE_VERSION = 1;
+    // vars User table
+    public static final String TABLE_NAME = "user";
     public static final String COL_USER_ID = "user_id";
     public static final String COL_USER_PHONE = "user_phone";
     public static final String COL_USER_PASSWORD = "user_password";
+    // vars for Login table
+    public static final String TABLE_NAME2 = "login";
+    public static final String COL_LOG_ID = "ID";
+    public static final String COL_LOG_PHONE = "phoneNum";
+    public static final String COL_LOG_TIME = "time";
+    public static final String COL_LOG_EVENT = "event";
 
-    //Creating Database
+    // create User Table
     private String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_NAME + "("
             + COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COL_USER_PHONE + " STRING,"
             + COL_USER_PASSWORD + " TEXT)";
-    //Drop SQL Table
+    //Drop User Table
     private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+    // create Login Table
+    private String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_NAME2 + "("
+            + COL_LOG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COL_LOG_PHONE + " STRING,"
+            + COL_LOG_TIME + " STRING," + COL_LOG_EVENT + " STRING)";
+    //Drop Login Table
+    private String DROP_LOGIN_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME2;
 
     //Class constructor
     public DatabaseHelper(Context context) {
@@ -35,13 +50,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_USER_TABLE);
+        sqLiteDatabase.execSQL(CREATE_LOGIN_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         sqLiteDatabase.execSQL(DROP_USER_TABLE);
+        sqLiteDatabase.execSQL(DROP_LOGIN_TABLE);
         onCreate(sqLiteDatabase);
-
     }
 
     //Method to add new users
@@ -112,4 +128,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else
             return false;
     }
+
+    //Method to log event to db
+    public void logEvent(String phoneNumber, String time, String event) throws SQLiteException {
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COL_LOG_PHONE, phoneNumber);
+            contentValues.put(COL_LOG_TIME, time);
+            contentValues.put(COL_LOG_EVENT, event);
+            db.insert(TABLE_NAME2, null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+            System.out.println("E's logEvent Error: " + e);
+        }
+    }// end logEvent method
 }

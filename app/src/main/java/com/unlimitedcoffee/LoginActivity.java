@@ -68,11 +68,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String phoneNumber = Utilities.sanitize(mTextPhoneNumber.getText().toString());
                 String password = Utilities.sanitize(mTextPassword.getText().toString());
-                Boolean res = db.checkUser(phoneNumber,password);
-                //If phone number and password are correct
+                String event;
+                String time = Utilities.getTimeStr(); // gets current time as string
+                Boolean result = db.checkUser(phoneNumber,password); // validates phone / pword combo
 
-                if(res == true) {
+                if(result) { // credentials are valid
                     session.createLoginSession(phoneNumber);
+                    // log user event to db: successful login
+                    event = "successful login";
+                    db.logEvent(phoneNumber, time, event);
                     //send the user to the message history page
                     Intent messageHistApp = new Intent(LoginActivity.this, MessageHistoryActivity.class);
                     startActivity(messageHistApp);
