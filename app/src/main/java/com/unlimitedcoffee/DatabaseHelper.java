@@ -171,24 +171,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             // set up db query for time of failed events - where phone# matches and event = 'Failed Login'
             String[] columns = {COL_LOG_TIME};
-            String selection = COL_LOG_PHONE + "=? " + COL_LOG_EVENT + "=?";
+            String selection = COL_LOG_PHONE + " =? AND " + COL_LOG_EVENT + " =?";
             String[] selectionArgs = {phoneNumber, event};
             int failCount = 0;
 
-            System.out.println("**********Check 0");
+            System.out.println("**********Check 0");//***************************************
             // query the db
             Cursor cursor = db.query(TABLE_NAME2, columns, selection, selectionArgs, null, null, null);
-            System.out.println("**********Check OA");
+            if (cursor) {
+                System.out.println("**********Check 0A: query executed");//***************************************
+            }
+            System.out.println("**********Check 1");//***************************************
             // eval query results
             if (cursor.moveToFirst()) {
-                System.out.println("**********Check OB");
+                System.out.println("**********Check 2");//***************************************
                 int colIndex = cursor.getColumnIndex("Time");
                 do {
                     String failTimeStr;
                     failTimeStr = cursor.getString(colIndex);
-                    System.out.println("**********Check 1: failTimeStr = " + failTimeStr); //***************************************
+                    System.out.println("**********Check 3: failTimeStr = " + failTimeStr); //***************************************
                     try { // parse string to Date object
-                        System.out.println("**********Check 2"); //***************************************
+                        System.out.println("**********Check 4"); //***************************************
                         thenTime = dateFormat.parse(failTimeStr);
                     } catch (ParseException e) {
                         System.out.println("checkLockout Error: " + e);
