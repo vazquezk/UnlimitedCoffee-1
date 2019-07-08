@@ -71,6 +71,10 @@ public class LoginActivity extends AppCompatActivity {
                 String event;
                 String time = Utilities.getTimeStr(); // gets current time as string
 
+                // clear user entry fields
+                mTextPhoneNumber.getText().clear();
+                mTextPassword.getText().clear();
+
                 // check lockout
                 boolean lockStatus = db.checkAccountStatus(phoneNumber); //true = no lock on account, OK to proceed
 
@@ -85,6 +89,8 @@ public class LoginActivity extends AppCompatActivity {
                         // log user event to db: successful login
                         event = "successful login";
                         db.logEvent(phoneNumber, time, event);
+                        Toast.makeText(LoginActivity.this, "Login successful - Welcome!",Toast.LENGTH_SHORT).show();
+
                         //send the user to the message history page
                         Intent messageHistApp = new Intent(LoginActivity.this, MessageHistoryActivity.class);
                         startActivity(messageHistApp);

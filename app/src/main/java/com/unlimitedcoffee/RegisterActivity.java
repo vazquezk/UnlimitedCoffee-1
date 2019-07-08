@@ -50,6 +50,11 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = Utilities.sanitize(mTextPassword.getText().toString());
                 String cf_password = Utilities.sanitize(mTextCfPassword.getText().toString());
 
+                // clear user entry fields
+                mTextPhoneNumber.getText().clear();
+                mTextPassword.getText().clear();
+                mTextCfPassword.getText().clear();
+
                 //Validating phone number
                 if(isValidMobile(phoneNumber)) {
                     //Checks if phone number is already registered
@@ -67,12 +72,13 @@ public class RegisterActivity extends AppCompatActivity {
                             String event = "successful login";
                             String time = Utilities.getTimeStr(); // gets current time as string
                             db.logEvent(phoneNumber, time, event);
+                            Toast.makeText(RegisterActivity.this, "Registration successful - Welcome!", Toast.LENGTH_SHORT).show();
 
                             // redirect to Message History screen
                             Intent smsApp = new Intent(RegisterActivity.this, MessageHistoryActivity.class);
                             startActivity(smsApp);
                         } else {
-                            Toast.makeText(RegisterActivity.this, "Passwords don't match or doesn't meet requirements!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, "Passwords don't match or don't meet requirements!", Toast.LENGTH_SHORT).show();
                         }
                     }else{
                         Toast.makeText(RegisterActivity.this, "Phone number already registered.", Toast.LENGTH_SHORT).show();
