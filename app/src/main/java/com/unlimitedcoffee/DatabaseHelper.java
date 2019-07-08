@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final byte[] databaseBytes = Hide.getDatabaseName();
     public static final String databaseName = new String(databaseBytes);

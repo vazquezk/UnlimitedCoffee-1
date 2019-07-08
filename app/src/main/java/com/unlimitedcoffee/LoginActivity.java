@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Account Locked", Toast.LENGTH_SHORT).show();
 
                 } else { // true = unlocked account, proceed with user authentication
-                    Boolean result = db.checkUser(phoneNumber,password); // validates phone / pword combo
+                    boolean result = db.checkUser(phoneNumber,password); // validates phone / pword combo
 
                     if(result) { // credentials are valid
                         session.createLoginSession(phoneNumber);
