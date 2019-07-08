@@ -184,8 +184,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             System.out.println("**********Check 1");//***************************************
             // eval query results
             if (cursor.moveToFirst()) {
-                System.out.println("**********Check 2");//***************************************
+                System.out.println("**********Check 2a");//***************************************
                 int colIndex = cursor.getColumnIndex("time");
+                System.out.println("**********Check 2b");//***************************************
                 do {
                     System.out.println("**********Check 3a");//***************************************
                     String failTimeStr;
@@ -207,8 +208,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         //convert to mins
                         long diffMinutes = diff / (60 * 1000) % 60;
                         System.out.println("**********Check 5: diff in mins = " + diffMinutes); //***************************************
-                        // increment failCount if happened in past 15 mins
-                        if (diffMinutes < 15) {
+                        // increment failCount if happened in past 5 mins
+                        if (diffMinutes < 5) {
                             failCount++;
                             System.out.println("**********Check 5A: failcount = " + failCount); //***************************************
                         }
@@ -222,7 +223,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
             db.close();
 
-            if (failCount > 3) { // user is locked, return true
+            if (failCount > 2) { // user is locked, return true
                 System.out.println("******************1. User is locked"); //***********************************
                 return false;
 

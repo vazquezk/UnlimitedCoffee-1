@@ -76,26 +76,33 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (!lockStatus) { //false = locked account, back to the Login Page
                     Toast.makeText(LoginActivity.this, "Account Locked", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Account is *NOT* Locked", Toast.LENGTH_SHORT).show();
+
+                } else { // true = unlocked account, proceed with user authentication
+                    Toast.makeText(LoginActivity.this, "Account is *NOT* Locked", Toast.LENGTH_SHORT).show(); //********************
+
+                    Boolean result = db.checkUser(phoneNumber,password); // validates phone / pword combo
+
+                    if(result) { // credentials are valid
+                        session.createLoginSession(phoneNumber);
+                        // log user event to db: successful login
+                        event = "successful login";
+                        db.logEvent(phoneNumber, time, event);
+                        //send the user to the message history page
+                        Intent messageHistApp = new Intent(LoginActivity.this, MessageHistoryActivity.class);
+                        startActivity(messageHistApp);
+
+                    }else{ // credentials are invalid
+                        event = "failed login";
+                        db.logEvent(phoneNumber, time, event);
+                        Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
+                    }
+
+
+
+
                 }
 
-                Boolean result = db.checkUser(phoneNumber,password); // validates phone / pword combo
 
-                if(result) { // credentials are valid
-                    session.createLoginSession(phoneNumber);
-                    // log user event to db: successful login
-                    event = "successful login";
-                    db.logEvent(phoneNumber, time, event);
-                    //send the user to the message history page
-                    Intent messageHistApp = new Intent(LoginActivity.this, MessageHistoryActivity.class);
-                    startActivity(messageHistApp);
-
-                }else{ // credentials are invalid
-                    event = "failed login";
-                    db.logEvent(phoneNumber, time, event);
-                    Toast.makeText(LoginActivity.this, "Wrong password/phone number",Toast.LENGTH_SHORT).show();
-                }
             }
         });
 
