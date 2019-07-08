@@ -201,7 +201,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                             failCount++;
                         }
                     }
-
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -216,6 +215,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             System.out.println("Error: Exception " + e);
             return false; // assume locked if error
         }
-
-    } // end checkLockout method
+    } // end checkAccountStatus method
 }
