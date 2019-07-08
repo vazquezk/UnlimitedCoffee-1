@@ -174,13 +174,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String selection = COL_LOG_PHONE + "=? &" + COL_LOG_EVENT + "=?";
             String[] selectionArgs = {phoneNumber, event};
             int failCount = 0;
+
             System.out.println("**********Check 0");
             // query the db
             Cursor cursor = db.query(TABLE_NAME2, columns, selection, selectionArgs, null, null, null);
-            System.out.println("**********Check OA);
+            System.out.println("**********Check OA");
             // eval query results
             if (cursor.moveToFirst()) {
-                System.out.println("**********Check OB);
+                System.out.println("**********Check OB");
                 int colIndex = cursor.getColumnIndex("Time");
                 do {
                     String failTimeStr;
