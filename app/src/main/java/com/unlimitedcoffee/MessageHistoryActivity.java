@@ -33,6 +33,11 @@ public class MessageHistoryActivity extends AppCompatActivity {
     ArrayList<String> messages = new ArrayList<>();
     ArrayList <Conversation> conversations = new ArrayList<Conversation>();
 
+    @Override // prevents navigation back to Login or Registration pages
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     /**
      * One create method for the message History activity
      * @param savedInstanceState
