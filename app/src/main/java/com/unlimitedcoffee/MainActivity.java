@@ -1,6 +1,7 @@
 package com.unlimitedcoffee;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +37,10 @@ public class MainActivity extends AppCompatActivity {
     EditText text_Phone_Number;
     SmsManager smsManager = SmsManager.getDefault();
     String actualPhoneNumber;
-    PNDatabaseHelper PNdatabase;    // phone number data base helper
+    PNDatabaseHelper PNdatabase;    // phone number data base
+
+    //Contact's method variable
+    static final int PICK_CONTACT = 1;
 
 
     private static MainActivity inst;
@@ -107,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(settings);
                 return true;
             case R.id.contacts_search:
-                Intent contacts_search = new Intent(MainActivity.this, ContactsSearchActivity.class);
-                startActivity(contacts_search);
+                Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                startActivityForResult(intent, PICK_CONTACT);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -243,6 +247,35 @@ public class MainActivity extends AppCompatActivity {
             return phoneNumber;
         } else {
             return getContactDisplayNameByNumber(phoneNumber, this);
+        }
+    }
+
+    /*
+    Method to retrieve phone numbers from Contacts list.
+     */
+    public void onActivityResult ( int reqCode, int resultCode, Intent data){
+        super.onActivityResult(reqCode, resultCode, data);
+        switch (reqCode) {
+            case (PICK_CONTACT):
+                if (resultCode == Activity.RESULT_OK) {
+                    Uri contactData = data.getData();
+                    Cursor c = getContentResolver().query(contactData, null, null, null, null);
+                    if (c.moveToFirst()) {
+                        String id = c.getString(c.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+                        String hasPhone = c.getString(c.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+
+                            if (hasPhone.equalsIgnoreCase("1")) {
+                                Cursor phones = getContentResolver().query(
+                                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id,
+                                        null, null);
+                                phones.moveToFirst();
+                                String phoneTxt = phones.getString(phones.getColumnIndex("data1"));
+                                text_Phone_Number.setText(phoneTxt.replaceAll("[\\(\\)\\-\\ ]",""));
+                            }
+                    }
+                }
+                break;
         }
     }
 
