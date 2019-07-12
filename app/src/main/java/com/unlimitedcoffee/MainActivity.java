@@ -80,8 +80,9 @@ public class MainActivity extends AppCompatActivity {
             actualPhoneNumber = incomingNumber;
             text_Phone_Number.setText(phoneNumberAlias(incomingNumber));  // transfers
             text_Phone_Number.setEnabled(false);
+        } else {
+            actualPhoneNumber = "";
         }
-
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -271,7 +272,9 @@ public class MainActivity extends AppCompatActivity {
                                         null, null);
                                 phones.moveToFirst();
                                 String phoneTxt = phones.getString(phones.getColumnIndex("data1"));
-                                text_Phone_Number.setText(phoneTxt.replaceAll("[\\(\\)\\-\\ ]",""));
+                                actualPhoneNumber = phoneTxt.replaceAll("[\\(\\)\\-\\ ]","");
+                                text_Phone_Number.setText(phoneNumberAlias(phoneTxt.replaceAll("[\\(\\)\\-\\ ]","")));
+                                text_Phone_Number.setEnabled(false);
                             }
                     }
                 }
