@@ -182,7 +182,10 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     /**
      * The following two methods create the menu of options in MessageHistoryActivity
