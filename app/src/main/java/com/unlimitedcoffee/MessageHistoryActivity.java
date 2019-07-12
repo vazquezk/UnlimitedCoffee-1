@@ -58,6 +58,14 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_history);
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS}, REQUEST_PERMISSION);
+
+        }
+
         conversations = new ArrayList<Conversation>();
         smsListView = (ListView) findViewById(R.id.lvMsg);
         registerForContextMenu(smsListView);
@@ -174,7 +182,10 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     /**
      * The following two methods create the menu of options in MessageHistoryActivity
@@ -546,13 +557,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
     public String getContactDisplayNameByNumber(String number, Context context) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
         String name = "";
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS,
-                            Manifest.permission.WRITE_CONTACTS}, REQUEST_PERMISSION);
 
-        }
         ContentResolver contentResolver = context.getContentResolver();
         Cursor contactLookup = contentResolver.query(uri, null, null, null, null);
 
