@@ -41,7 +41,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
     ArrayList<String> messages = new ArrayList<>();
     ArrayList<String> dates = new ArrayList<>();
     ArrayList<String> readStat = new ArrayList<>();
-    ArrayList <Conversation> conversations = new ArrayList<Conversation>();
+    ArrayList <Conversation> conversations ;
     PNDatabaseHelper PNdatabase;
     private static final int REQUEST_PERMISSION = 1;
 
@@ -58,7 +58,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_history);
-
+        conversations = new ArrayList<Conversation>();
         smsListView = (ListView) findViewById(R.id.lvMsg);
         registerForContextMenu(smsListView);
 
