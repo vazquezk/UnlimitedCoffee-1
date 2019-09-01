@@ -41,7 +41,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
     ArrayList<String> messages = new ArrayList<>();
     ArrayList<String> dates = new ArrayList<>();
     ArrayList<String> readStat = new ArrayList<>();
-    ArrayList <Conversation> conversations = new ArrayList<Conversation>();
+    ArrayList <Conversation> conversations ;
     PNDatabaseHelper PNdatabase;
     private static final int REQUEST_PERMISSION = 1;
 
@@ -58,7 +58,15 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message_history);
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS}, REQUEST_PERMISSION);
 
+        }
+
+        conversations = new ArrayList<Conversation>();
         smsListView = (ListView) findViewById(R.id.lvMsg);
         registerForContextMenu(smsListView);
 
@@ -67,7 +75,13 @@ public class MessageHistoryActivity extends AppCompatActivity {
         smsListView.setAdapter(msgAdapter);
 
         PNdatabase = new PNDatabaseHelper(this);
-        checkDatabase();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            getPermissionToReadSMS();
+        } else {
+            checkDatabase();;
+        }
+
         // assign new message button
         newMsgBtn = (FloatingActionButton) findViewById(R.id.newMsgBtn);
         //send user to new message entry page
@@ -137,7 +151,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public void getPermissionToSendSMS() {
+    public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(
                     Manifest.permission.READ_SMS)) {
@@ -168,7 +182,10 @@ public class MessageHistoryActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     /**
      * The following two methods create the menu of options in MessageHistoryActivity
@@ -194,10 +211,6 @@ public class MessageHistoryActivity extends AppCompatActivity {
             case R.id.newMsgBtn_settings:   // New message
                 Intent toNewMessage = new Intent(MessageHistoryActivity.this, MainActivity.class);
                 startActivity(toNewMessage);
-                return true;
-            case R.id.newGrpMsgBtn_settings:    // new Group Message
-                Intent toNewGrpMessage = new Intent(MessageHistoryActivity.this, MainActivity.class);
-                startActivity(toNewGrpMessage);
                 return true;
             case R.id.refreshBtn:
                 refreshAllMessages();
@@ -397,11 +410,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
             ArrayList<String> numTimes = new ArrayList<String>();
             ArrayList<String> numRdStat = new ArrayList<>();
             for (Message m : StoredMessages) {
-                System.out.println("m.getNumber() " + m.getNumber());
-                System.out.println("PNnumbers.getString(index) " + PNnumbers.getString(index));
                 if (m.getNumber().equals("+" + PNnumbers.getString(index))) {
-                    System.out.println("m.getNumber() " + m.getNumber());
-
                     numMessages.add(m.getBody());
                     numTimes.add(m.getTimeStamp());
                     numRdStat.add(m.getReadStat());
@@ -544,13 +553,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
     public String getContactDisplayNameByNumber(String number, Context context) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
         String name = "";
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS,
-                            Manifest.permission.WRITE_CONTACTS}, REQUEST_PERMISSION);
 
-        }
         ContentResolver contentResolver = context.getContentResolver();
         Cursor contactLookup = contentResolver.query(uri, null, null, null, null);
 
@@ -590,6 +593,7 @@ public class MessageHistoryActivity extends AppCompatActivity {
             System.out.println("Content : " + PNInboxCursor.getString(pnIndexAddress));
         } while (PNInboxCursor.moveToNext());
     }
+
 
 }   // end class
 

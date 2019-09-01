@@ -12,6 +12,7 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     SmsManager smsManager = SmsManager.getDefault();
     String actualPhoneNumber;
     PNDatabaseHelper PNdatabase;    // phone number data base
-
+    private static final int REQUEST_PERMISSION = 1;
     //Contact's method variable
     static final int PICK_CONTACT = 1;
 
@@ -75,13 +76,30 @@ public class MainActivity extends AppCompatActivity {
         messages.setAdapter(arrayAdapter);
         PNdatabase = new PNDatabaseHelper(this);
 
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS}, REQUEST_PERMISSION);
+
+        }
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_SMS,
+                            Manifest.permission.WRITE_CONTACTS}, REQUEST_PERMISSION);
+
+        }
+
         if (getIntent().hasExtra("com.unlimitedcoffee.SELECTED_NUMBER")) {
             String incomingNumber = getIntent().getStringExtra("com.unlimitedcoffee.SELECTED_NUMBER");
             actualPhoneNumber = incomingNumber;
             text_Phone_Number.setText(phoneNumberAlias(incomingNumber));  // transfers
             text_Phone_Number.setEnabled(false);
+        } else {
+            actualPhoneNumber = "";
         }
-
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -89,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             refreshSmsInbox();
         }
+
+
 
     }
     /*
@@ -152,6 +172,11 @@ public class MainActivity extends AppCompatActivity {
                         PNdatabase.addPhoneNumber(sentPhoneNumber.replace("+", "")); // add phone number to the database
                     }
                     Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+
+                    if (text_Phone_Number.isEnabled()) {
+                        text_Phone_Number.setText(phoneNumberAlias(sentPhoneNumber));
+                        text_Phone_Number.setEnabled(false);
+                    }
                     input.setText("");
                 }
             }
@@ -222,7 +247,6 @@ public class MainActivity extends AppCompatActivity {
     public String getContactDisplayNameByNumber(String number, Context context) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
         String name = "";
-
         ContentResolver contentResolver = context.getContentResolver();
         Cursor contactLookup = contentResolver.query(uri, null, null, null, null);
 
@@ -271,7 +295,9 @@ public class MainActivity extends AppCompatActivity {
                                         null, null);
                                 phones.moveToFirst();
                                 String phoneTxt = phones.getString(phones.getColumnIndex("data1"));
-                                text_Phone_Number.setText(phoneTxt.replaceAll("[\\(\\)\\-\\ ]",""));
+                                actualPhoneNumber = phoneTxt.replaceAll("[\\(\\)\\-\\ ]","");
+                                text_Phone_Number.setText(phoneNumberAlias(phoneTxt.replaceAll("[\\(\\)\\-\\ ]","")));
+                                text_Phone_Number.setEnabled(false);
                             }
                     }
                 }
